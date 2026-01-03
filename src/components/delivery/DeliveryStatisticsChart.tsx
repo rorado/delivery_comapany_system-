@@ -143,7 +143,7 @@ export default function DeliveryStatisticsChart() {
     },
     {
       name: "Livraisons échouées",
-      data: [12, 14, 20, 11, 11, 11, 10, 13, 15, 12, 14, 14],
+      data: [20, 25, 30, 22, 28, 24, 26, 30, 28, 25, 22, 20],
     },
   ];
 
