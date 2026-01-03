@@ -74,7 +74,7 @@ The delivery management system includes:
 - **Route Planning** - Interactive route optimization
 - **Customer Portal** - Customer management and history
 - **Analytics Dashboard** - Comprehensive delivery analytics
-<!-- - **Calendar Integration** - Schedule management -->
+
 - **Data Visualization** - Charts and graphs for delivery metrics
 - **Dark Mode Support**
 
