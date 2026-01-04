@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState,useCallback } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -31,7 +31,9 @@ const navItems: NavItem[] = [
   {
     icon: <GridIcon />,
     name: "Tableau de bord",
-    subItems: [{ name: "Vue d'ensemble des livraisons", path: "/admin", pro: false }],
+    subItems: [
+      { name: "Vue d'ensemble des livraisons", path: "/admin", pro: false },
+    ],
   },
   {
     icon: <BoxIconLine />,
@@ -57,7 +59,11 @@ const navItems: NavItem[] = [
     name: "Rapports",
     icon: <PieChartIcon />,
     subItems: [
-      { name: "Rapports de livraison", path: "/admin/rapports/livraisons", pro: false },
+      {
+        name: "Rapports de livraison",
+        path: "/admin/rapports/livraisons",
+        pro: false,
+      },
       { name: "Analyses", path: "/admin/rapports/analyses", pro: false },
     ],
   },
@@ -219,7 +225,7 @@ const AppSidebar: React.FC = () => {
   const subMenuRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   // const isActive = (path: string) => path === pathname;
-   const isActive = useCallback((path: string) => path === pathname, [pathname]);
+  const isActive = useCallback((path: string) => path === pathname, [pathname]);
 
   useEffect(() => {
     // Check if the current path matches any submenu item
@@ -245,7 +251,7 @@ const AppSidebar: React.FC = () => {
     if (!submenuMatched) {
       setOpenSubmenu(null);
     }
-  }, [pathname,isActive]);
+  }, [pathname, isActive]);
 
   useEffect(() => {
     // Set the height of the submenu items when the submenu is opened
@@ -326,7 +332,7 @@ const AppSidebar: React.FC = () => {
           <div className="flex flex-col gap-4">
             <div>
               <h2
-                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
+                className={`mb-4 text-xs uppercase flex leading-5 text-gray-400 ${
                   !isExpanded && !isHovered
                     ? "lg:justify-center"
                     : "justify-start"
@@ -341,9 +347,9 @@ const AppSidebar: React.FC = () => {
               {renderMenuItems(navItems, "main")}
             </div>
 
-            <div className="">
+            {/* <div className="">
               <h2
-                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
+                className={`mb-4 text-xs uppercase flex leading-5 text-gray-400 ${
                   !isExpanded && !isHovered
                     ? "lg:justify-center"
                     : "justify-start"
@@ -356,10 +362,10 @@ const AppSidebar: React.FC = () => {
                 )}
               </h2>
               {renderMenuItems(othersItems, "others")}
-            </div>
+            </div> */}
           </div>
         </nav>
-        {isExpanded || isHovered || isMobileOpen ? <SidebarWidget /> : null}
+        {/* {isExpanded || isHovered || isMobileOpen ? <SidebarWidget /> : null} */}
       </div>
     </aside>
   );

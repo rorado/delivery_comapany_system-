@@ -19,7 +19,6 @@ import jsPDF from "jspdf";
 
 interface Shipment {
   id: number;
-  trackingNumber: string;
   packageNumber: string;
   sender: string;
   senderPhone: string;
@@ -49,138 +48,132 @@ interface Shipment {
 const initialShipments: Shipment[] = [
   {
     id: 1,
-    trackingNumber: "DLV-2024-001",
-    packageNumber: "TANG000143MA",
-    sender: "Deliverio",
-    senderPhone: "0667449851",
-    recipient: "hello",
-    recipientPhone: "0690201401",
-    origin: "New York, NY",
-    destination: "Los Angeles, CA",
+    packageNumber: "CASA000201MA",
+    sender: "Atlas Delivery",
+    senderPhone: "0661234567",
+    recipient: "Youssef El Amrani",
+    recipientPhone: "0678452310",
+    origin: "Casablanca – Sidi Maarouf",
+    destination: "Tanger – Malabata",
     city: "Tanger",
-    address: "kjjkljk;kl",
+    address: "45 Boulevard Mohammed VI, Malabata",
     weight: "2.5 kg",
-    product: "ghghj Tanger",
+    product: "Electronics",
     comment: "",
-    price: "800 DH",
+    price: "80 DH",
     status: "In Transit",
-    driver: "Mike Johnson",
-    estimatedDelivery: "2024-01-15",
+    driver: "Ahmed Benali",
+    estimatedDelivery: "2026-01-15",
     createdAt: "31-12-2025",
     createdAtTime: "09:12",
     image: "",
   },
   {
     id: 2,
-    trackingNumber: "DLV-2024-002",
-    packageNumber: "TANG000144MA",
-    sender: "Deliverio",
-    senderPhone: "0667449851",
-    recipient: "Sarah Williams",
-    recipientPhone: "0690201402",
-    origin: "Chicago, IL",
-    destination: "Houston, TX",
+    packageNumber: "CASA000202MA",
+    sender: "Atlas Delivery",
+    senderPhone: "0661234567",
+    recipient: "Khadija Zahraoui",
+    recipientPhone: "0698123456",
+    origin: "Rabat – Agdal",
+    destination: "Casablanca – Bourgogne",
     city: "Casablanca",
-    address: "123 Main Street",
+    address: "12 Rue Ahmed Chawki, Bourgogne",
     weight: "5.0 kg",
-    product: "Electronics",
+    product: "Home Appliances",
     comment: "Handle with care",
-    price: "1200 DH",
+    price: "120 DH",
     status: "Out for Delivery",
-    driver: "David Brown",
-    estimatedDelivery: "2024-01-12",
+    driver: "Hassan El Idrissi",
+    estimatedDelivery: "2026-01-12",
     createdAt: "30-12-2025",
     createdAtTime: "14:30",
     image: "",
   },
   {
     id: 3,
-    trackingNumber: "DLV-2024-003",
-    packageNumber: "TANG000145MA",
-    sender: "Deliverio",
-    senderPhone: "0667449851",
-    recipient: "Robert Davis",
-    recipientPhone: "0690201403",
-    origin: "Miami, FL",
-    destination: "Seattle, WA",
+    packageNumber: "RAB000203MA",
+    sender: "Atlas Delivery",
+    senderPhone: "0661234567",
+    recipient: "Mohamed Ait Lahcen",
+    recipientPhone: "0612349876",
+    origin: "Meknes – Hamria",
+    destination: "Rabat – Hay Riad",
     city: "Rabat",
-    address: "456 Avenue Hassan II",
+    address: "78 Avenue Annakhil, Hay Riad",
     weight: "1.2 kg",
     product: "Documents",
     comment: "Urgent delivery",
-    price: "500 DH",
+    price: "40 DH",
     status: "Delivered",
-    driver: "James Wilson",
-    estimatedDelivery: "2024-01-11",
+    driver: "Yassine Mouline",
+    estimatedDelivery: "2026-01-11",
     createdAt: "29-12-2025",
     createdAtTime: "10:45",
     image: "",
   },
   {
     id: 4,
-    trackingNumber: "DLV-2024-004",
-    packageNumber: "TANG000146MA",
-    sender: "Deliverio",
-    senderPhone: "0667449851",
-    recipient: "Emily Martinez",
-    recipientPhone: "0690201404",
-    origin: "Boston, MA",
-    destination: "Phoenix, AZ",
+    packageNumber: "MRK000204MA",
+    sender: "Atlas Delivery",
+    senderPhone: "0661234567",
+    recipient: "Fatima Ezzahra Bennis",
+    recipientPhone: "0687456123",
+    origin: "Casablanca – Ain Sebaa",
+    destination: "Marrakech – Gueliz",
     city: "Marrakech",
-    address: "789 Boulevard Mohammed VI",
+    address: "210 Avenue Mohammed V, Gueliz",
     weight: "8.5 kg",
     product: "Furniture",
     comment: "",
-    price: "2500 DH",
+    price: "250 DH",
     status: "Pending",
-    driver: "Michael Lee",
-    estimatedDelivery: "2024-01-18",
+    driver: "Omar Chafik",
+    estimatedDelivery: "2026-01-18",
     createdAt: "28-12-2025",
     createdAtTime: "16:20",
     image: "",
   },
   {
     id: 5,
-    trackingNumber: "DLV-2024-005",
-    packageNumber: "TANG000147MA",
-    sender: "Deliverio",
-    senderPhone: "0667449851",
-    recipient: "Michael Taylor",
-    recipientPhone: "0690201405",
-    origin: "Denver, CO",
-    destination: "Portland, OR",
+    packageNumber: "FES000205MA",
+    sender: "Atlas Delivery",
+    senderPhone: "0661234567",
+    recipient: "Abdelilah Skalli",
+    recipientPhone: "0623457891",
+    origin: "Fes – Ville Nouvelle",
+    destination: "Meknes – Toulal",
     city: "Fes",
-    address: "321 Rue Allal Ben Abdellah",
+    address: "33 Rue Allal Ben Abdellah",
     weight: "3.8 kg",
     product: "Clothing",
     comment: "Fragile",
-    price: "950 DH",
+    price: "70 DH",
     status: "Delivered",
-    driver: "Chris Anderson",
-    estimatedDelivery: "2024-01-10",
+    driver: "Rachid Ouhmid",
+    estimatedDelivery: "2026-01-10",
     createdAt: "27-12-2025",
     createdAtTime: "11:15",
     image: "",
   },
   {
     id: 6,
-    trackingNumber: "DLV-2024-006",
-    packageNumber: "TANG000148MA",
-    sender: "Deliverio",
-    senderPhone: "0667449851",
-    recipient: "Lisa Anderson",
-    recipientPhone: "0690201406",
-    origin: "Atlanta, GA",
-    destination: "San Francisco, CA",
+    packageNumber: "AGA000206MA",
+    sender: "Atlas Delivery",
+    senderPhone: "0661234567",
+    recipient: "Samira El Fassi",
+    recipientPhone: "0609876543",
+    origin: "Marrakech – Sidi Youssef",
+    destination: "Agadir – Talborjt",
     city: "Agadir",
-    address: "654 Avenue du 20 Août",
+    address: "90 Avenue du 20 Août, Talborjt",
     weight: "6.2 kg",
     product: "Food Items",
     comment: "Keep refrigerated",
-    price: "1100 DH",
+    price: "110 DH",
     status: "In Transit",
-    driver: "Mike Johnson",
-    estimatedDelivery: "2024-01-16",
+    driver: "Said Azzouzi",
+    estimatedDelivery: "2026-01-16",
     createdAt: "26-12-2025",
     createdAtTime: "13:00",
     image: "",
@@ -236,9 +229,7 @@ export default function ShipmentsPage() {
   // Filter shipments
   const filteredShipments = shipments.filter((shipment) => {
     const matchesSearch =
-      shipment.trackingNumber
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
+      shipment.packageNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
       shipment.sender.toLowerCase().includes(searchTerm.toLowerCase()) ||
       shipment.recipient.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus =
@@ -319,73 +310,102 @@ export default function ShipmentsPage() {
   };
 
   const handleExportPDF = (shipment: Shipment) => {
-    const doc = new jsPDF();
+    const doc = new jsPDF({ unit: "pt", format: "a4" });
     const pageWidth = doc.internal.pageSize.getWidth();
-    const margin = 20;
+    const margin = 40;
     let yPos = margin;
 
-    // Title
-    doc.setFontSize(18);
+    // Colors
+    const primaryColor = "#4a90e2";
+    const secondaryColor = "#f5f5f5";
+    const grayColor = "#666";
+
+    // --- HEADER ---
+    doc.setFillColor(primaryColor);
+    doc.rect(0, 0, pageWidth, 80, "F");
+
+    doc.setFontSize(22);
+    doc.setTextColor("#fff");
     doc.setFont("helvetica", "bold");
-    doc.text("Détails du Colis", pageWidth / 2, yPos, { align: "center" });
+    doc.text("Détails du Colis", pageWidth / 2, 50, { align: "center" });
+
+    yPos = 100;
+
+    // --- SENDER & RECIPIENT SECTION ---
+    doc.setFontSize(12);
+    doc.setTextColor(grayColor);
+    doc.setFont("helvetica", "bold");
+    doc.text("Expéditeur", margin, yPos);
+    doc.text("Destinataire", pageWidth / 2 + 10, yPos);
     yPos += 15;
 
-    // Sender Information
-    doc.setFontSize(12);
-    doc.setFont("helvetica", "bold");
-    doc.text("Expéditeur : " + shipment.sender, margin, yPos);
-    yPos += 7;
     doc.setFont("helvetica", "normal");
-    doc.text("Tél : " + shipment.senderPhone, margin, yPos);
-    yPos += 7;
+    doc.text(shipment.sender, margin, yPos);
+    doc.text(shipment.recipient, pageWidth / 2 + 10, yPos);
+    yPos += 15;
+
+    doc.text("Tél: " + shipment.senderPhone, margin, yPos);
+    doc.text("Tél: " + shipment.recipientPhone, pageWidth / 2 + 10, yPos);
+    yPos += 15;
+
+    doc.text("Ville: " + shipment.city, margin, yPos);
+    doc.text("Adresse: " + shipment.address, pageWidth / 2 + 10, yPos);
+    yPos += 30;
+
+    // --- PACKAGE INFO BOX ---
+    doc.setFillColor(secondaryColor);
+    doc.roundedRect(margin, yPos, pageWidth - 2 * margin, 80, 5, 5, "F");
+    doc.setTextColor(grayColor);
+    doc.setFont("helvetica", "bold");
+    doc.text("#NUMÉRO DE COLIS:", margin + 10, yPos + 20);
+    doc.setFont("helvetica", "normal");
+    doc.text(shipment.packageNumber, margin + 150, yPos + 20);
+
+    doc.setFont("helvetica", "bold");
+    doc.text("Produit:", margin + 10, yPos + 40);
+    doc.setFont("helvetica", "normal");
+    doc.text(shipment.product, margin + 150, yPos + 40);
+
+    doc.setFont("helvetica", "bold");
+    doc.text("Commentaire:", margin + 10, yPos + 60);
+    doc.setFont("helvetica", "normal");
+    doc.text(shipment.comment || "-", margin + 150, yPos + 60);
+
+    yPos += 100;
+
+    // --- PRICE SECTION ---
+    doc.setFillColor(primaryColor);
+    doc.rect(margin, yPos, pageWidth - 2 * margin, 40, "F");
+    doc.setTextColor("#fff");
+    doc.setFont("helvetica", "bold");
+    doc.text("Prix: " + shipment.price, margin + 10, yPos + 25);
+
+    yPos += 60;
+
+    // --- DATE & STATUS ---
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(grayColor);
     doc.text(
-      "Date : " + shipment.createdAt + " " + shipment.createdAtTime,
+      "Date: " + shipment.createdAt + " " + shipment.createdAtTime,
       margin,
       yPos
     );
-    yPos += 10;
+    doc.text("Statut: " + shipment.status, pageWidth / 2, yPos);
 
-    // Recipient Information
-    doc.setFont("helvetica", "bold");
-    doc.text("Destinataire: " + shipment.recipient, margin, yPos);
-    yPos += 7;
-    doc.setFont("helvetica", "normal");
-    doc.text("Tél: " + shipment.recipientPhone, margin, yPos);
-    yPos += 7;
-    doc.text("Ville: " + shipment.city, margin, yPos);
-    yPos += 7;
-    doc.text("Adresse: " + shipment.address, margin, yPos);
-    yPos += 10;
+    // --- FOOTER ---
+    doc.setFontSize(10);
+    doc.setTextColor("#999");
+    doc.text(
+      "Merci d'avoir choisi notre service de livraison.",
+      pageWidth / 2,
+      doc.internal.pageSize.getHeight() - 30,
+      { align: "center" }
+    );
 
-    // Package Number
-    doc.setFont("helvetica", "bold");
-    doc.text("#NUMÉRO DE COLIS", margin, yPos);
-    yPos += 7;
-    doc.setFontSize(14);
-    doc.text(shipment.packageNumber, margin, yPos);
-    yPos += 10;
-
-    // Product
-    doc.setFontSize(12);
-    doc.setFont("helvetica", "normal");
-    doc.text("Produit: " + shipment.product, margin, yPos);
-    yPos += 7;
-
-    // Comment
-    if (shipment.comment) {
-      doc.text("Commentaire: " + shipment.comment, margin, yPos);
-      yPos += 7;
-    } else {
-      doc.text("Commentaire:", margin, yPos);
-      yPos += 7;
-    }
-
-    // Price
-    doc.setFont("helvetica", "bold");
-    doc.text(shipment.price, margin, yPos);
-
-    // Save PDF
-    doc.save(`Colis_${shipment.packageNumber}.pdf`);
+    // Open PDF in new tab
+    const pdfBlob = doc.output("blob");
+    const pdfUrl = URL.createObjectURL(pdfBlob);
+    window.open(pdfUrl, "_blank");
   };
 
   const handleSaveShipment = () => {
@@ -398,7 +418,6 @@ export default function ShipmentsPage() {
                 ...shipment,
                 ...formData,
                 packageNumber: shipment.packageNumber,
-                trackingNumber: shipment.trackingNumber,
                 createdAt: shipment.createdAt,
                 createdAtTime: shipment.createdAtTime,
               }
@@ -421,7 +440,6 @@ export default function ShipmentsPage() {
       });
       const newShipment: Shipment = {
         id: newId,
-        trackingNumber: `DLV-2024-${String(newId).padStart(3, "0")}`,
         packageNumber: `TANG${String(newId + 142).padStart(6, "0")}MA`,
         ...formData,
         createdAt: dateStr,
@@ -595,7 +613,7 @@ export default function ShipmentsPage() {
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/3">
         <div className="max-w-full overflow-x-auto">
           <Table>
             <TableHeader className="border-b border-gray-100 dark:border-gray-800">
@@ -640,7 +658,7 @@ export default function ShipmentsPage() {
                   isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
-                  Chauffeur
+                  Prix
                 </TableCell>
                 <TableCell
                   isHeader
@@ -754,7 +772,7 @@ export default function ShipmentsPage() {
                       </Badge>
                     </TableCell>
                     <TableCell className="px-5 py-3 text-gray-500 text-theme-sm dark:text-gray-400">
-                      {shipment.driver}
+                      {shipment.price}
                     </TableCell>
                     <TableCell className="px-5 py-3 text-gray-500 text-theme-sm dark:text-gray-400">
                       {shipment.estimatedDelivery}
@@ -815,20 +833,22 @@ export default function ShipmentsPage() {
       <Modal
         isOpen={isDetailOpen}
         onClose={closeDetailModal}
-        className="max-w-[600px] p-5 lg:p-10"
+        className="max-w-[600px] w-full max-h-[90vh] m-4 overflow-hidden p-0"
       >
         {viewingShipment && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
+          <div className="flex max-h-[90vh] flex-col">
+            <div className="flex items-center justify-between p-5 lg:p-8">
               <h4 className="text-lg font-semibold text-gray-800 dark:text-white/90">
-                Détails du Colis
+                Détails du colis
               </h4>
               <button
                 onClick={closeDetailModal}
                 className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                aria-label="Fermer"
+                type="button"
               >
                 <svg
-                  className="w-5 h-5"
+                  className="h-5 w-5"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -843,87 +863,99 @@ export default function ShipmentsPage() {
                 </svg>
               </button>
             </div>
-            <div className="space-y-4 border-t border-gray-200 pt-4 dark:border-gray-700">
-              <div>
-                <h5 className="font-semibold text-gray-800 dark:text-white/90 mb-2">
-                  Expéditeur
-                </h5>
-                <p className="text-gray-600 dark:text-gray-400">
-                  {viewingShipment.sender}
-                </p>
-                <p className="text-gray-600 dark:text-gray-400">
-                  Tél : {viewingShipment.senderPhone}
-                </p>
-                <p className="text-gray-600 dark:text-gray-400">
-                  Date : {viewingShipment.createdAt}{" "}
-                  {viewingShipment.createdAtTime}
-                </p>
-              </div>
-              <div>
-                <h5 className="font-semibold text-gray-800 dark:text-white/90 mb-2">
-                  Destinataire
-                </h5>
-                <p className="text-gray-600 dark:text-gray-400">
-                  {viewingShipment.recipient}
-                </p>
-                <p className="text-gray-600 dark:text-gray-400">
-                  Tél: {viewingShipment.recipientPhone}
-                </p>
-                <p className="text-gray-600 dark:text-gray-400">
-                  Ville: {viewingShipment.city}
-                </p>
-                <p className="text-gray-600 dark:text-gray-400">
-                  Adresse: {viewingShipment.address}
-                </p>
-              </div>
-              <div>
-                <h5 className="font-semibold text-gray-800 dark:text-white/90 mb-2">
-                  #NUMÉRO DE COLIS
-                </h5>
-                <p className="text-lg font-bold text-gray-800 dark:text-white/90">
-                  {viewingShipment.packageNumber}
-                </p>
-              </div>
-              {viewingShipment.image && (
+
+            <div className="flex-1 overflow-y-auto px-5 pb-5 lg:px-8 lg:pb-8 custom-scrollbar">
+              <div className="space-y-4 border-t border-gray-200 pt-4 dark:border-gray-700">
                 <div>
-                  <h5 className="font-semibold text-gray-800 dark:text-white/90 mb-2">
-                    Package Image
+                  <h5 className="mb-2 font-semibold text-gray-800 dark:text-white/90">
+                    Expéditeur
                   </h5>
-                  <img
-                    src={viewingShipment.image}
-                    alt={viewingShipment.packageNumber}
-                    className="w-full max-w-md h-auto object-cover rounded-lg border border-gray-300 dark:border-gray-700"
-                  />
+                  <p className="text-gray-600 dark:text-gray-400">
+                    {viewingShipment.sender}
+                  </p>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    Tél : {viewingShipment.senderPhone}
+                  </p>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    Date : {viewingShipment.createdAt}{" "}
+                    {viewingShipment.createdAtTime}
+                  </p>
                 </div>
-              )}
-              <div>
-                <p className="text-gray-600 dark:text-gray-400">
-                  Produit: {viewingShipment.product}
-                </p>
-                <p className="text-gray-600 dark:text-gray-400">
-                  Commentaire: {viewingShipment.comment || "-"}
-                </p>
-                <p className="text-lg font-bold text-gray-800 dark:text-white/90 mt-2">
-                  {viewingShipment.price}
-                </p>
+
+                <div>
+                  <h5 className="mb-2 font-semibold text-gray-800 dark:text-white/90">
+                    Destinataire
+                  </h5>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    {viewingShipment.recipient}
+                  </p>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    Tél : {viewingShipment.recipientPhone}
+                  </p>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    Ville : {viewingShipment.city}
+                  </p>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    Adresse : {viewingShipment.address}
+                  </p>
+                </div>
+
+                <div>
+                  <h5 className="mb-2 font-semibold text-gray-800 dark:text-white/90">
+                    Numéro de colis
+                  </h5>
+                  <p className="text-lg font-bold text-gray-800 dark:text-white/90">
+                    {viewingShipment.packageNumber}
+                  </p>
+                </div>
+
+                {viewingShipment.image && (
+                  <div>
+                    <h5 className="mb-2 font-semibold text-gray-800 dark:text-white/90">
+                      Image du colis
+                    </h5>
+                    <div className="w-full overflow-hidden rounded-lg border border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800">
+                      <img
+                        src={viewingShipment.image}
+                        alt={viewingShipment.packageNumber}
+                        className="h-auto max-h-80 w-full object-contain"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                <div>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    Produit : {viewingShipment.product}
+                  </p>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    Commentaire : {viewingShipment.comment || "-"}
+                  </p>
+                  <p className="mt-2 text-lg font-bold text-gray-800 dark:text-white/90">
+                    {viewingShipment.price}
+                  </p>
+                </div>
               </div>
             </div>
-            <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                onClick={closeDetailModal}
-              >
-                Fermer
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                onClick={() => handleExportPDF(viewingShipment)}
-              >
-                Exporter en PDF
-              </Button>
+
+            <div className="shrink-0 border-t border-gray-200 p-5 dark:border-gray-700 lg:p-8">
+              <div className="flex items-center justify-end gap-3">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={closeDetailModal}
+                >
+                  Fermer
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={() => handleExportPDF(viewingShipment)}
+                >
+                  Exporter en PDF
+                </Button>
+              </div>
             </div>
           </div>
         )}
@@ -960,7 +992,11 @@ export default function ShipmentsPage() {
                     type="file"
                     accept="image/*"
                     onChange={handleImageChange}
-                    className="focus:border-ring-brand-300 h-11 w-full overflow-hidden rounded-lg border border-gray-300 bg-transparent text-sm text-gray-500 shadow-theme-xs transition-colors file:mr-5 file:border-collapse file:cursor-pointer file:rounded-l-lg file:border-0 file:border-r file:border-solid file:border-gray-200 file:bg-gray-50 file:py-3 file:pl-3.5 file:pr-3 file:text-sm file:text-gray-700 placeholder:text-gray-400 hover:file:bg-gray-100 focus:outline-hidden focus:file:ring-brand-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400 dark:text-white/90 dark:file:border-gray-800 dark:file:bg-white/[0.03] dark:file:text-gray-400 dark:placeholder:text-gray-400"
+                    className="focus:border-ring-brand-300 h-11 w-full overflow-hidden rounded-lg border border-gray-300 bg-transparent text-sm text-gray-500 shadow-theme-xs 
+                    transition-colors file:mr-5 file:border-collapse file:cursor-pointer file:rounded-l-lg file:border-0 file:border-r file:border-solid file:border-gray-200
+                     file:bg-gray-50 file:py-3 file:pl-3.5 file:pr-3 file:text-sm file:text-gray-700 placeholder:text-gray-400 hover:file:bg-gray-100 focus:outline-hidden
+                      focus:file:ring-brand-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400 dark:file:border-gray-800
+                       dark:file:bg-white/3 dark:file:text-gray-400 dark:placeholder:text-gray-400"
                   />
                   {imagePreview && (
                     <div className="mt-3">
@@ -1031,7 +1067,8 @@ export default function ShipmentsPage() {
                         setFormData({ ...formData, recipient: e.target.value })
                       }
                       required
-                      className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/10 focus:border-brand-300 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700"
+                      className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 
+                      focus:outline-none focus:ring-2 focus:ring-brand-500/10 focus:border-brand-300 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700"
                     />
                   </div>
                   <div>
@@ -1047,7 +1084,9 @@ export default function ShipmentsPage() {
                         })
                       }
                       required
-                      className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/10 focus:border-brand-300 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700"
+                      className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-theme-xs
+                       placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/10 focus:border-brand-300
+                        dark:bg-gray-900 dark:text-white/90 dark:border-gray-700"
                     />
                   </div>
                   <div>
@@ -1060,7 +1099,8 @@ export default function ShipmentsPage() {
                         setFormData({ ...formData, city: e.target.value })
                       }
                       required
-                      className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/10 focus:border-brand-300 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700"
+                      className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400
+                       focus:outline-none focus:ring-2 focus:ring-brand-500/10 focus:border-brand-300 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700"
                     />
                   </div>
                   <div>
@@ -1073,7 +1113,8 @@ export default function ShipmentsPage() {
                         setFormData({ ...formData, address: e.target.value })
                       }
                       required
-                      className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/10 focus:border-brand-300 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700"
+                      className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 
+                      focus:outline-none focus:ring-2 focus:ring-brand-500/10 focus:border-brand-300 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700"
                     />
                   </div>
                 </div>
@@ -1081,7 +1122,10 @@ export default function ShipmentsPage() {
 
               {/* Shipping Details Section */}
               <div className="space-y-4">
-                <h5 className="text-sm font-semibold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 pb-2">
+                <h5
+                  className="text-sm font-semibold text-gray-700 dark:text-gray-300 border-b border-gray-200
+                 dark:border-gray-700 pb-2"
+                >
                   Détails d'Expédition
                 </h5>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1095,7 +1139,8 @@ export default function ShipmentsPage() {
                         setFormData({ ...formData, origin: e.target.value })
                       }
                       required
-                      className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/10 focus:border-brand-300 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700"
+                      className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-none focus:ring-2
+                       focus:ring-brand-500/10 focus:border-brand-300 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700"
                     />
                   </div>
                   <div>
@@ -1111,7 +1156,8 @@ export default function ShipmentsPage() {
                         })
                       }
                       required
-                      className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/10 focus:border-brand-300 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700"
+                      className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-none focus:ring-2
+                       focus:ring-brand-500/10 focus:border-brand-300 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700"
                     />
                   </div>
                   <div>
@@ -1124,7 +1170,8 @@ export default function ShipmentsPage() {
                         setFormData({ ...formData, product: e.target.value })
                       }
                       required
-                      className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/10 focus:border-brand-300 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700"
+                      className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-none focus:ring-2
+                       focus:ring-brand-500/10 focus:border-brand-300 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700"
                     />
                   </div>
                   <div>
@@ -1137,7 +1184,8 @@ export default function ShipmentsPage() {
                         setFormData({ ...formData, price: e.target.value })
                       }
                       required
-                      className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/10 focus:border-brand-300 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700"
+                      className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 
+                      focus:outline-none focus:ring-2 focus:ring-brand-500/10 focus:border-brand-300 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700"
                     />
                   </div>
                   <div>
@@ -1162,7 +1210,8 @@ export default function ShipmentsPage() {
                       onChange={(e) =>
                         setFormData({ ...formData, comment: e.target.value })
                       }
-                      className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/10 focus:border-brand-300 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700"
+                      className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-none focus:ring-2
+                       focus:ring-brand-500/10 focus:border-brand-300 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700"
                     />
                   </div>
                 </div>
@@ -1212,7 +1261,8 @@ export default function ShipmentsPage() {
                           status: e.target.value as Shipment["status"],
                         })
                       }
-                      className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-theme-xs focus:outline-none focus:ring-2 focus:ring-brand-500/10 focus:border-brand-300 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700"
+                      className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-theme-xs focus:outline-none focus:ring-2
+                       focus:ring-brand-500/10 focus:border-brand-300 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700"
                     >
                       <option value="Pending">En attente</option>
                       <option value="In Transit">En transit</option>
