@@ -18,7 +18,12 @@ interface ShipmentTracking {
   origin: string;
   destination: string;
   currentLocation: string;
-  status: "Pending" | "In Transit" | "Out for Delivery" | "Delivered" | "Failed";
+  status:
+    | "Pending"
+    | "In Transit"
+    | "Out for Delivery"
+    | "Delivered"
+    | "Failed";
   estimatedDelivery: string;
   driver: string;
   vehicle: string;
@@ -29,90 +34,97 @@ const trackingData: ShipmentTracking[] = [
   {
     id: 1,
     trackingNumber: "DLV-2024-001",
-    sender: "ABC Company",
-    recipient: "John Smith",
-    origin: "New York, NY",
-    destination: "Los Angeles, CA",
-    currentLocation: "Chicago, IL",
+    sender: "Atlas Logistique",
+    recipient: "Khadija El Amrani",
+    origin: "Casablanca",
+    destination: "Rabat",
+    currentLocation: "Settat",
     status: "In Transit",
-    estimatedDelivery: "2024-01-15 14:00",
-    driver: "Mike Johnson",
+    estimatedDelivery: "2026-01-06 14:00",
+    driver: "Omar El Fassi",
     vehicle: "DLV-001",
     events: [
       {
-        time: "2024-01-12 14:30",
-        location: "Los Angeles, CA",
+        time: "2026-01-05 16:30",
+        location: "Rabat",
         status: "Delivered",
-        description: "Package delivered successfully",
+        description: "Colis livré avec succès",
       },
       {
-        time: "2024-01-12 10:15",
-        location: "Los Angeles, CA",
+        time: "2026-01-05 11:10",
+        location: "Rabat",
         status: "Out for Delivery",
-        description: "Driver is on the way",
+        description: "Le livreur est en route",
       },
       {
-        time: "2024-01-11 16:45",
-        location: "Chicago, IL",
+        time: "2026-01-04 18:45",
+        location: "Settat",
         status: "In Transit",
-        description: "Package in transit",
+        description: "Colis en transit",
       },
       {
-        time: "2024-01-10 09:00",
-        location: "New York, NY",
+        time: "2026-01-04 09:00",
+        location: "Casablanca",
         status: "Pending",
-        description: "Package picked up",
+        description: "Colis récupéré chez l'expéditeur",
       },
     ],
   },
   {
     id: 2,
     trackingNumber: "DLV-2024-002",
-    sender: "XYZ Corp",
-    recipient: "Sarah Williams",
-    origin: "Chicago, IL",
-    destination: "Houston, TX",
-    currentLocation: "Houston, TX",
+    sender: "Société Maghreb Express",
+    recipient: "Yassine Benali",
+    origin: "Tanger",
+    destination: "Marrakech",
+    currentLocation: "Marrakech",
     status: "Out for Delivery",
-    estimatedDelivery: "2024-01-12 16:00",
-    driver: "David Brown",
+    estimatedDelivery: "2026-01-05 16:00",
+    driver: "Sara Aït Lahcen",
     vehicle: "DLV-002",
     events: [
       {
-        time: "2024-01-12 11:00",
-        location: "Houston, TX",
+        time: "2026-01-05 11:00",
+        location: "Marrakech",
         status: "Out for Delivery",
-        description: "Driver is on the way",
+        description: "Le livreur est en route",
       },
       {
-        time: "2024-01-11 18:30",
-        location: "Dallas, TX",
+        time: "2026-01-04 18:30",
+        location: "Béni Mellal",
         status: "In Transit",
-        description: "Package in transit",
+        description: "Colis en transit",
       },
       {
-        time: "2024-01-08 10:00",
-        location: "Chicago, IL",
+        time: "2026-01-04 08:30",
+        location: "Tanger",
         status: "Pending",
-        description: "Package picked up",
+        description: "Colis récupéré au dépôt",
       },
     ],
   },
 ];
 
+const statusLabels: Record<ShipmentTracking["status"], string> = {
+  Pending: "En attente",
+  "In Transit": "En transit",
+  "Out for Delivery": "En livraison",
+  Delivered: "Livré",
+  Failed: "Échoué",
+};
+
 export default function TrackingPage() {
-  const [selectedShipment, setSelectedShipment] = useState<ShipmentTracking | null>(
-    trackingData[0]
-  );
+  const [selectedShipment, setSelectedShipment] =
+    useState<ShipmentTracking | null>(trackingData[0]);
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-800 dark:text-white/90">
-          Shipment Tracking
+          Suivi des expéditions
         </h1>
         <p className="mt-1 text-gray-500 dark:text-gray-400">
-          Track shipments and deliveries in real-time.
+          Suivez vos expéditions et livraisons en temps réel.
         </p>
       </div>
 
@@ -121,7 +133,7 @@ export default function TrackingPage() {
         <div className="lg:col-span-1 space-y-4">
           <div className="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/[0.03]">
             <h2 className="mb-4 font-semibold text-gray-800 dark:text-white/90">
-              Active Shipments
+              Expéditions actives
             </h2>
             <div className="space-y-3">
               {trackingData.map((shipment) => (
@@ -156,7 +168,7 @@ export default function TrackingPage() {
                           : "error"
                       }
                     >
-                      {shipment.status}
+                      {statusLabels[shipment.status]}
                     </Badge>
                   </div>
                 </div>
@@ -191,31 +203,39 @@ export default function TrackingPage() {
                       : "error"
                   }
                 >
-                  {selectedShipment.status}
+                  {statusLabels[selectedShipment.status]}
                 </Badge>
               </div>
 
               <div className="grid grid-cols-2 gap-4 mb-6">
                 <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Current Location</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Current Location
+                  </p>
                   <p className="mt-1 font-medium text-gray-800 dark:text-white/90">
                     {selectedShipment.currentLocation}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Estimated Delivery</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Estimated Delivery
+                  </p>
                   <p className="mt-1 font-medium text-gray-800 dark:text-white/90">
                     {selectedShipment.estimatedDelivery}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Driver</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Driver
+                  </p>
                   <p className="mt-1 font-medium text-gray-800 dark:text-white/90">
                     {selectedShipment.driver}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Vehicle</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Vehicle
+                  </p>
                   <p className="mt-1 font-medium text-gray-800 dark:text-white/90">
                     {selectedShipment.vehicle}
                   </p>
@@ -224,7 +244,7 @@ export default function TrackingPage() {
 
               <div>
                 <h3 className="mb-4 font-semibold text-gray-800 dark:text-white/90">
-                  Tracking History
+                  Historique de suivi
                 </h3>
                 <div className="space-y-4">
                   {selectedShipment.events.map((event, index) => (

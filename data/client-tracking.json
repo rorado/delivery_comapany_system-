@@ -1,0 +1,259 @@
+[
+  {
+    "trackingNumber": "DLV-2024-001",
+    "sender": "Atlas Logistique",
+    "recipient": "Khadija El Amrani",
+    "origin": "Casablanca",
+    "destination": "12 Avenue Mohammed V, Rabat 10000",
+    "currentLocation": "Settat",
+    "status": "En transit",
+    "estimatedDelivery": "2026-01-06 14:00",
+    "weight": "2,5 kg",
+    "events": [
+      {
+        "time": "2026-01-05 14:30",
+        "location": "Settat",
+        "status": "En transit",
+        "description": "Colis en route vers sa destination"
+      },
+      {
+        "time": "2026-01-04 10:15",
+        "location": "Casablanca",
+        "status": "En transit",
+        "description": "Colis parti du centre d'origine"
+      },
+      {
+        "time": "2026-01-04 09:00",
+        "location": "Casablanca",
+        "status": "En attente",
+        "description": "Colis récupéré chez l'expéditeur"
+      }
+    ]
+  },
+  {
+    "trackingNumber": "DLV-2024-002",
+    "sender": "Société Maghreb Express",
+    "recipient": "Yassine Benali",
+    "origin": "Tanger",
+    "destination": "Boulevard Hassan II, Marrakech 40000",
+    "currentLocation": "Marrakech",
+    "status": "Livré",
+    "estimatedDelivery": "2026-01-05 16:00",
+    "weight": "5,0 kg",
+    "events": [
+      {
+        "time": "2026-01-05 15:30",
+        "location": "Marrakech",
+        "status": "Livré",
+        "description": "Colis livré avec succès"
+      },
+      {
+        "time": "2026-01-05 10:00",
+        "location": "Marrakech",
+        "status": "En livraison",
+        "description": "Le livreur est en route"
+      },
+      {
+        "time": "2026-01-04 18:30",
+        "location": "Marrakech",
+        "status": "En transit",
+        "description": "Colis arrivé au centre de destination"
+      },
+      {
+        "time": "2026-01-04 08:30",
+        "location": "Tanger",
+        "status": "En attente",
+        "description": "Colis récupéré chez l'expéditeur"
+      }
+    ]
+  },
+  {
+    "trackingNumber": "CASA000201MA",
+    "sender": "Atlas Delivery",
+    "recipient": "Youssef El Amrani",
+    "recipientPhone": "0678452310",
+    "origin": "Casablanca – Sidi Maarouf",
+    "destination": "Tanger – Malabata",
+    "city": "Tanger",
+    "address": "45 Boulevard Mohammed VI, Malabata",
+    "currentLocation": "Tanger",
+    "status": "En transit",
+    "estimatedDelivery": "2026-01-15",
+    "weight": "2.5 kg",
+    "product": "Electronics",
+    "price": "80 DH",
+    "comment": "",
+    "createdAt": "31-12-2025",
+    "createdAtTime": "09:12",
+    "events": [
+      {
+        "time": "31-12-2025 09:12",
+        "location": "Tanger",
+        "status": "En transit",
+        "description": "Colis créé"
+      }
+    ]
+  },
+  {
+    "trackingNumber": "CASA000202MA",
+    "sender": "Atlas Delivery",
+    "recipient": "Khadija Zahraoui",
+    "recipientPhone": "0698123456",
+    "origin": "Rabat – Agdal",
+    "destination": "Casablanca – Bourgogne",
+    "city": "Casablanca",
+    "address": "12 Rue Ahmed Chawki, Bourgogne",
+    "currentLocation": "Casablanca",
+    "status": "En livraison",
+    "estimatedDelivery": "2026-01-12",
+    "weight": "5.0 kg",
+    "product": "Home Appliances",
+    "price": "120 DH",
+    "comment": "Handle with care",
+    "createdAt": "30-12-2025",
+    "createdAtTime": "14:30",
+    "events": [
+      {
+        "time": "30-12-2025 14:30",
+        "location": "Casablanca",
+        "status": "En livraison",
+        "description": "Colis créé"
+      }
+    ]
+  },
+  {
+    "trackingNumber": "RAB000203MA",
+    "sender": "Atlas Delivery",
+    "recipient": "Mohamed Ait Lahcen",
+    "recipientPhone": "0612349876",
+    "origin": "Meknes – Hamria",
+    "destination": "Rabat – Hay Riad",
+    "city": "Rabat",
+    "address": "78 Avenue Annakhil, Hay Riad",
+    "currentLocation": "Rabat – Hay Riad",
+    "status": "Livré",
+    "estimatedDelivery": "2026-01-11",
+    "weight": "1.2 kg",
+    "product": "Documents",
+    "price": "40 DH",
+    "comment": "Urgent delivery",
+    "createdAt": "29-12-2025",
+    "createdAtTime": "10:45",
+    "events": [
+      {
+        "time": "29-12-2025 10:45",
+        "location": "Rabat – Hay Riad",
+        "status": "Livré",
+        "description": "Colis créé"
+      }
+    ]
+  },
+  {
+    "trackingNumber": "MRK000204MA",
+    "sender": "Atlas Delivery",
+    "recipient": "Fatima Ezzahra Bennis",
+    "recipientPhone": "0687456123",
+    "origin": "Casablanca – Ain Sebaa",
+    "destination": "Marrakech – Gueliz",
+    "city": "Marrakech",
+    "address": "210 Avenue Mohammed V, Gueliz",
+    "currentLocation": "Marrakech",
+    "status": "En attente",
+    "estimatedDelivery": "2026-01-18",
+    "weight": "8.5 kg",
+    "product": "Furniture",
+    "price": "250 DH",
+    "comment": "",
+    "createdAt": "28-12-2025",
+    "createdAtTime": "16:20",
+    "events": [
+      {
+        "time": "28-12-2025 16:20",
+        "location": "Marrakech",
+        "status": "En attente",
+        "description": "Colis créé"
+      }
+    ]
+  },
+  {
+    "trackingNumber": "FES000205MA",
+    "sender": "Atlas Delivery",
+    "recipient": "Abdelilah Skalli",
+    "recipientPhone": "0623457891",
+    "origin": "Fes – Ville Nouvelle",
+    "destination": "Meknes – Toulal",
+    "city": "Fes",
+    "address": "33 Rue Allal Ben Abdellah",
+    "currentLocation": "Meknes – Toulal",
+    "status": "Livré",
+    "estimatedDelivery": "2026-01-10",
+    "weight": "3.8 kg",
+    "product": "Clothing",
+    "price": "70 DH",
+    "comment": "Fragile",
+    "createdAt": "27-12-2025",
+    "createdAtTime": "11:15",
+    "events": [
+      {
+        "time": "27-12-2025 11:15",
+        "location": "Meknes – Toulal",
+        "status": "Livré",
+        "description": "Colis créé"
+      }
+    ]
+  },
+  {
+    "trackingNumber": "AGA000206MA",
+    "sender": "Atlas Delivery",
+    "recipient": "Samira El Fassi",
+    "recipientPhone": "0609876543",
+    "origin": "Marrakech – Sidi Youssef",
+    "destination": "Agadir – Talborjt",
+    "city": "Agadir",
+    "address": "90 Avenue du 20 Août, Talborjt",
+    "currentLocation": "Agadir",
+    "status": "En transit",
+    "estimatedDelivery": "2026-01-16",
+    "weight": "6.2 kg",
+    "product": "Food Items",
+    "price": "110 DH",
+    "comment": "Keep refrigerated",
+    "createdAt": "26-12-2025",
+    "createdAtTime": "13:00",
+    "events": [
+      {
+        "time": "26-12-2025 13:00",
+        "location": "Agadir",
+        "status": "En transit",
+        "description": "Colis créé"
+      }
+    ]
+  },
+  {
+    "trackingNumber": "fdfdbgnfd",
+    "sender": "Client",
+    "recipient": "fdsfdsvfdv",
+    "recipientPhone": "95465465764567",
+    "origin": "Khouribga",
+    "destination": "dvfdvdv",
+    "city": "Khouribga",
+    "address": "dvfdvdv",
+    "currentLocation": "Khouribga",
+    "status": "En attente",
+    "estimatedDelivery": "",
+    "weight": "",
+    "product": "dcscdsvsdv",
+    "price": "500",
+    "comment": "Fragile: Non | Échange: Non | Action: Ouvrir le colis",
+    "createdAt": "05/01/2026",
+    "createdAtTime": "00:39",
+    "events": [
+      {
+        "time": "05/01/2026 00:39",
+        "location": "Khouribga",
+        "status": "En attente",
+        "description": "Colis créé"
+      }
+    ]
+  }
+]

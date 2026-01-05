@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -14,83 +14,25 @@ import { Modal } from "@/components/ui/modal";
 import { useModal } from "@/hooks/useModal";
 import Button from "@/components/ui/button/Button";
 import Label from "@/components/form/Label";
+import ConfirmDeleteModal from "@/components/common/ConfirmDeleteModal";
 
-interface Driver {
-  id: number;
-  name: string;
-  email: string;
-  phone: string;
-  vehicle: string;
-  status: "Active" | "On Route" | "Offline" | "On Break";
-  deliveries: number;
-  rating: number;
-  image: string;
-}
+import type { Driver } from "@/types/driver";
+import { adminChauffeursSeed } from "@/data/adminChauffeursSeed";
 
-const initialDrivers: Driver[] = [
-  {
-    id: 1,
-    name: "Mohamed El Amrani",
-    email: "mohamed.elamrani@livraison.ma",
-    phone: "+212 600-123456",
-    vehicle: "Camion #DLV-001",
-    status: "On Route",
-    deliveries: 245,
-    rating: 4.8,
-    image: "/images/user/user-01.jpg",
-  },
-  {
-    id: 2,
-    name: "Youssef Benali",
-    email: "youssef.benali@livraison.ma",
-    phone: "+212 600-234567",
-    vehicle: "Van #DLV-002",
-    status: "Active",
-    deliveries: 189,
-    rating: 4.9,
-    image: "/images/user/user-02.jpg",
-  },
-  {
-    id: 3,
-    name: "Fatima Zahra Idrissi",
-    email: "fatima.idrissi@livraison.ma",
-    phone: "+212 600-345678",
-    vehicle: "Camion #DLV-003",
-    status: "On Route",
-    deliveries: 312,
-    rating: 4.7,
-    image: "/images/user/user-03.jpg",
-  },
-  {
-    id: 4,
-    name: "Rachid El Haddad",
-    email: "rachid.haddad@livraison.ma",
-    phone: "+212 600-456789",
-    vehicle: "Van #DLV-004",
-    status: "On Break",
-    deliveries: 156,
-    rating: 4.6,
-    image: "/images/user/user-04.jpg",
-  },
-  {
-    id: 5,
-    name: "Imane Bennis",
-    email: "imane.bennis@livraison.ma",
-    phone: "+212 600-567890",
-    vehicle: "Camion #DLV-005",
-    status: "Active",
-    deliveries: 278,
-    rating: 4.9,
-    image: "/images/user/user-05.jpg",
-  },
-];
+const DEFAULT_AVATAR = "/images/user/user-01.jpg";
 
 export default function DriversPage() {
-  const [drivers, setDrivers] = useState<Driver[]>(initialDrivers);
+  const [drivers, setDrivers] = useState<Driver[]>(adminChauffeursSeed);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const { isOpen, openModal, closeModal } = useModal();
+  const {
+    isOpen: isDeleteOpen,
+    openModal: openDeleteModal,
+    closeModal: closeDeleteModal,
+  } = useModal();
   const [editingDriver, setEditingDriver] = useState<Driver | null>(null);
+  const [deletingDriver, setDeletingDriver] = useState<Driver | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -98,6 +40,31 @@ export default function DriversPage() {
     vehicle: "",
     status: "Active" as Driver["status"],
   });
+
+  const saveDriversToDb = async (nextDrivers: Driver[]) => {
+    await fetch("/api/admin/chauffeurs", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(nextDrivers),
+    });
+  };
+
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        const res = await fetch("/api/admin/chauffeurs", { method: "GET" });
+        if (!res.ok) return;
+        const data = (await res.json()) as Driver[];
+        if (isMounted && Array.isArray(data)) setDrivers(data);
+      } catch {
+        // keep seed
+      }
+    })();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Filter drivers based on search and status
   const filteredDrivers = drivers.filter((driver) => {
@@ -134,20 +101,28 @@ export default function DriversPage() {
     openModal();
   };
 
-  const handleDeleteDriver = (id: number) => {
-    if (confirm("Are you sure you want to delete this driver?")) {
-      setDrivers(drivers.filter((driver) => driver.id !== id));
-    }
+  const handleRequestDeleteDriver = (driver: Driver) => {
+    setDeletingDriver(driver);
+    openDeleteModal();
+  };
+
+  const handleConfirmDeleteDriver = () => {
+    if (!deletingDriver) return;
+    const nextDrivers = drivers.filter((d) => d.id !== deletingDriver.id);
+    setDrivers(nextDrivers);
+    void saveDriversToDb(nextDrivers);
+    closeDeleteModal();
+    setDeletingDriver(null);
   };
 
   const handleSaveDriver = () => {
     if (editingDriver) {
       // Update existing driver
-      setDrivers(
-        drivers.map((driver) =>
-          driver.id === editingDriver.id ? { ...driver, ...formData } : driver
-        )
+      const nextDrivers = drivers.map((driver) =>
+        driver.id === editingDriver.id ? { ...driver, ...formData } : driver
       );
+      setDrivers(nextDrivers);
+      void saveDriversToDb(nextDrivers);
     } else {
       // Add new driver
       const newDriver: Driver = {
@@ -157,7 +132,9 @@ export default function DriversPage() {
         rating: 0,
         image: "/images/user/user-01.jpg",
       };
-      setDrivers([...drivers, newDriver]);
+      const nextDrivers = [...drivers, newDriver];
+      setDrivers(nextDrivers);
+      void saveDriversToDb(nextDrivers);
     }
     closeModal();
   };
@@ -321,7 +298,7 @@ export default function DriversPage() {
                           <Image
                             width={40}
                             height={40}
-                            src={driver.image}
+                            src={driver.image ?? DEFAULT_AVATAR}
                             alt={driver.name}
                             className="h-10 w-10 object-cover"
                           />
@@ -391,7 +368,7 @@ export default function DriversPage() {
                           <PencilIcon className="w-4 h-4" />
                         </button>
                         <button
-                          onClick={() => handleDeleteDriver(driver.id)}
+                          onClick={() => handleRequestDeleteDriver(driver)}
                           className="p-2 text-red-500 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 dark:text-red-400"
                           title="Supprimer"
                         >
@@ -514,6 +491,23 @@ export default function DriversPage() {
           </div>
         </form>
       </Modal>
+
+      <ConfirmDeleteModal
+        isOpen={isDeleteOpen}
+        onClose={() => {
+          closeDeleteModal();
+          setDeletingDriver(null);
+        }}
+        onConfirm={handleConfirmDeleteDriver}
+        title="Supprimer ce chauffeur ?"
+        description={
+          deletingDriver
+            ? `Cette action est irréversible. Chauffeur: ${deletingDriver.name}`
+            : "Cette action est irréversible."
+        }
+        confirmText="Supprimer"
+        cancelText="Annuler"
+      />
     </div>
   );
 }

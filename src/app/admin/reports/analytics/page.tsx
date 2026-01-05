@@ -105,7 +105,10 @@ export default function AnalyticsPage() {
   const revenueChartSeries = [
     {
       name: "Revenue",
-      data: [12500, 14800, 13200, 15600, 14200, 16800, 17500, 18900, 17200, 19500, 20100, 21500],
+      data: [
+        12500, 14800, 13200, 15600, 14200, 16800, 17500, 18900, 17200, 19500,
+        20100, 21500,
+      ],
     },
   ];
 
@@ -116,30 +119,55 @@ export default function AnalyticsPage() {
           Analytics Dashboard
         </h1>
         <p className="mt-1 text-gray-500 dark:text-gray-400">
-          View comprehensive analytics and insights for your delivery operations.
+          View comprehensive analytics and insights for your delivery
+          operations.
         </p>
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
         <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
-          <p className="text-sm text-gray-500 dark:text-gray-400">Total Deliveries</p>
-          <p className="mt-2 text-2xl font-bold text-gray-800 dark:text-white/90">4,872</p>
-          <p className="mt-1 text-xs text-green-600 dark:text-green-400">+12.5% from last month</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Total Deliveries
+          </p>
+          <p className="mt-2 text-2xl font-bold text-gray-800 dark:text-white/90">
+            4,872
+          </p>
+          <p className="mt-1 text-xs text-green-600 dark:text-green-400">
+            +12.5% from last month
+          </p>
         </div>
         <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
-          <p className="text-sm text-gray-500 dark:text-gray-400">Success Rate</p>
-          <p className="mt-2 text-2xl font-bold text-gray-800 dark:text-white/90">95.2%</p>
-          <p className="mt-1 text-xs text-green-600 dark:text-green-400">+2.1% from last month</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Success Rate
+          </p>
+          <p className="mt-2 text-2xl font-bold text-gray-800 dark:text-white/90">
+            95.2%
+          </p>
+          <p className="mt-1 text-xs text-green-600 dark:text-green-400">
+            +2.1% from last month
+          </p>
         </div>
         <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
-          <p className="text-sm text-gray-500 dark:text-gray-400">Total Revenue</p>
-          <p className="mt-2 text-2xl font-bold text-gray-800 dark:text-white/90">$198.5K</p>
-          <p className="mt-1 text-xs text-green-600 dark:text-green-400">+18.3% from last month</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Total Revenue
+          </p>
+          <p className="mt-2 text-2xl font-bold text-gray-800 dark:text-white/90">
+            $198.5K
+          </p>
+          <p className="mt-1 text-xs text-green-600 dark:text-green-400">
+            +18.3% from last month
+          </p>
         </div>
         <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03]">
-          <p className="text-sm text-gray-500 dark:text-gray-400">Avg. Delivery Time</p>
-          <p className="mt-2 text-2xl font-bold text-gray-800 dark:text-white/90">2.3 hrs</p>
-          <p className="mt-1 text-xs text-green-600 dark:text-green-400">-0.2 hrs from last month</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Avg. Delivery Time
+          </p>
+          <p className="mt-2 text-2xl font-bold text-gray-800 dark:text-white/90">
+            2.3 hrs
+          </p>
+          <p className="mt-1 text-xs text-green-600 dark:text-green-400">
+            -0.2 hrs from last month
+          </p>
         </div>
       </div>
 
@@ -158,7 +186,7 @@ export default function AnalyticsPage() {
 
         <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
           <h2 className="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">
-            Monthly Revenue
+            Revenu mensuel
           </h2>
           <ReactApexChart
             options={revenueChartOptions}
@@ -171,48 +199,82 @@ export default function AnalyticsPage() {
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
-          <h3 className="mb-4 font-semibold text-gray-800 dark:text-white/90">Top Drivers</h3>
+          <h3 className="mb-4 font-semibold text-gray-800 dark:text-white/90">
+            Top chauffeurs
+          </h3>
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-gray-500 text-theme-sm dark:text-gray-400">Mike Johnson</span>
-              <span className="font-medium text-gray-800 dark:text-white/90">245 deliveries</span>
+              <span className="text-gray-500 text-theme-sm dark:text-gray-400">
+                Omar El Fassi
+              </span>
+              <span className="font-medium text-gray-800 dark:text-white/90">
+                245 deliveries
+              </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-gray-500 text-theme-sm dark:text-gray-400">David Brown</span>
-              <span className="font-medium text-gray-800 dark:text-white/90">189 deliveries</span>
+              <span className="text-gray-500 text-theme-sm dark:text-gray-400">
+                Sara Aït Lahcen
+              </span>
+              <span className="font-medium text-gray-800 dark:text-white/90">
+                189 deliveries
+              </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-gray-500 text-theme-sm dark:text-gray-400">James Wilson</span>
-              <span className="font-medium text-gray-800 dark:text-white/90">312 deliveries</span>
+              <span className="text-gray-500 text-theme-sm dark:text-gray-400">
+                Hicham Berrada
+              </span>
+              <span className="font-medium text-gray-800 dark:text-white/90">
+                312 deliveries
+              </span>
             </div>
           </div>
         </div>
 
         <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
-          <h3 className="mb-4 font-semibold text-gray-800 dark:text-white/90">Top Routes</h3>
+          <h3 className="mb-4 font-semibold text-gray-800 dark:text-white/90">
+            Itinéraires principaux
+          </h3>
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-gray-500 text-theme-sm dark:text-gray-400">NYC to LA</span>
-              <span className="font-medium text-gray-800 dark:text-white/90">156 trips</span>
+              <span className="text-gray-500 text-theme-sm dark:text-gray-400">
+                Casablanca → Rabat
+              </span>
+              <span className="font-medium text-gray-800 dark:text-white/90">
+                156 trips
+              </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-gray-500 text-theme-sm dark:text-gray-400">Chicago Loop</span>
-              <span className="font-medium text-gray-800 dark:text-white/90">98 trips</span>
+              <span className="text-gray-500 text-theme-sm dark:text-gray-400">
+                Tanger → Fès
+              </span>
+              <span className="font-medium text-gray-800 dark:text-white/90">
+                98 trips
+              </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-gray-500 text-theme-sm dark:text-gray-400">Miami to Seattle</span>
-              <span className="font-medium text-gray-800 dark:text-white/90">87 trips</span>
+              <span className="text-gray-500 text-theme-sm dark:text-gray-400">
+                Marrakech → Agadir
+              </span>
+              <span className="font-medium text-gray-800 dark:text-white/90">
+                87 trips
+              </span>
             </div>
           </div>
         </div>
 
         <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/[0.03]">
-          <h3 className="mb-4 font-semibold text-gray-800 dark:text-white/90">Vehicle Utilization</h3>
+          <h3 className="mb-4 font-semibold text-gray-800 dark:text-white/90">
+            Utilisation des véhicules
+          </h3>
           <div className="space-y-3">
             <div>
               <div className="mb-1 flex items-center justify-between">
-                <span className="text-gray-500 text-theme-sm dark:text-gray-400">Active</span>
-                <span className="font-medium text-gray-800 dark:text-white/90">85%</span>
+                <span className="text-gray-500 text-theme-sm dark:text-gray-400">
+                  Active
+                </span>
+                <span className="font-medium text-gray-800 dark:text-white/90">
+                  85%
+                </span>
               </div>
               <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-800">
                 <div className="h-full w-[85%] bg-brand-500" />
@@ -220,8 +282,12 @@ export default function AnalyticsPage() {
             </div>
             <div>
               <div className="mb-1 flex items-center justify-between">
-                <span className="text-gray-500 text-theme-sm dark:text-gray-400">In Use</span>
-                <span className="font-medium text-gray-800 dark:text-white/90">72%</span>
+                <span className="text-gray-500 text-theme-sm dark:text-gray-400">
+                  In Use
+                </span>
+                <span className="font-medium text-gray-800 dark:text-white/90">
+                  72%
+                </span>
               </div>
               <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-800">
                 <div className="h-full w-[72%] bg-success-500" />
@@ -229,8 +295,12 @@ export default function AnalyticsPage() {
             </div>
             <div>
               <div className="mb-1 flex items-center justify-between">
-                <span className="text-gray-500 text-theme-sm dark:text-gray-400">Available</span>
-                <span className="font-medium text-gray-800 dark:text-white/90">15%</span>
+                <span className="text-gray-500 text-theme-sm dark:text-gray-400">
+                  Available
+                </span>
+                <span className="font-medium text-gray-800 dark:text-white/90">
+                  15%
+                </span>
               </div>
               <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-800">
                 <div className="h-full w-[15%] bg-info-500" />

@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -7,104 +7,73 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import Badge from "@/components/ui/badge/Badge";
 import Image from "next/image";
 import { PlusIcon, EyeIcon, PencilIcon, MailIcon, TrashBinIcon } from "@/icons";
 import { Modal } from "@/components/ui/modal";
 import { useModal } from "@/hooks/useModal";
 import Button from "@/components/ui/button/Button";
 import Label from "@/components/form/Label";
+import ConfirmDeleteModal from "@/components/common/ConfirmDeleteModal";
 
-interface Customer {
-  id: number;
-  name: string;
-  email: string;
-  phone: string;
-  address: string;
-  status: "Active" | "VIP" | "Inactive";
-  totalOrders: number;
-  totalSpent: string;
-  lastOrder: string;
-  image: string;
-}
+import type { Customer } from "@/types/customer";
+import { adminClientsSeed } from "@/data/adminClientsSeed";
 
-// Initial Moroccan customers
-const initialCustomers: Customer[] = [
-  {
-    id: 1,
-    name: "Youssef El Amrani",
-    email: "youssef.elamrani@mail.ma",
-    phone: "+212 600-123456",
-    address: "Rue de Casablanca, Casablanca",
-    status: "Active",
-    totalOrders: 12,
-    totalSpent: "1200 MAD",
-    lastOrder: "2026-01-01",
-    image: "/images/user/user-01.jpg",
-  },
-  {
-    id: 2,
-    name: "Fatima Zahra Lahlou",
-    email: "fatima.lahlou@mail.ma",
-    phone: "+212 612-345678",
-    address: "Avenue Mohammed V, Rabat",
-    status: "VIP",
-    totalOrders: 25,
-    totalSpent: "4800 MAD",
-    lastOrder: "2026-01-02",
-    image: "/images/user/user-02.jpg",
-  },
-  {
-    id: 3,
-    name: "Hassan Benkirane",
-    email: "hassan.benkirane@mail.ma",
-    phone: "+212 622-567890",
-    address: "Quartier Gauthier, Casablanca",
-    status: "Inactive",
-    totalOrders: 5,
-    totalSpent: "400 MAD",
-    lastOrder: "2025-12-15",
-    image: "/images/user/user-03.jpg",
-  },
-  {
-    id: 4,
-    name: "Khadija Bensalem",
-    email: "khadija.bensalem@mail.ma",
-    phone: "+212 633-678901",
-    address: "Marrakech Medina, Marrakech",
-    status: "Active",
-    totalOrders: 18,
-    totalSpent: "2200 MAD",
-    lastOrder: "2026-01-03",
-    image: "/images/user/user-04.jpg",
-  },
-  {
-    id: 5,
-    name: "Mohamed El Fassi",
-    email: "mohamed.elfassi@mail.ma",
-    phone: "+212 644-789012",
-    address: "Rue Agadir, Agadir",
-    status: "VIP",
-    totalOrders: 30,
-    totalSpent: "5600 MAD",
-    lastOrder: "2026-01-02",
-    image: "/images/user/user-05.jpg",
-  },
-];
+const DEFAULT_AVATAR = "/images/user/user-01.jpg";
 
 export default function CustomersPage() {
-  const [customers, setCustomers] = useState<Customer[]>(initialCustomers);
+  const [customers, setCustomers] = useState<Customer[]>(adminClientsSeed);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
   const { isOpen, openModal, closeModal } = useModal();
+  const {
+    isOpen: isDeleteOpen,
+    openModal: openDeleteModal,
+    closeModal: closeDeleteModal,
+  } = useModal();
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
+  const [deletingCustomer, setDeletingCustomer] = useState<Customer | null>(
+    null
+  );
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
     address: "",
-    status: "" as Customer["status"],
+    image: "",
   });
+
+  const saveCustomersToDb = async (nextCustomers: Customer[]) => {
+    const res = await fetch("/api/admin/clients", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(nextCustomers),
+    });
+
+    if (!res.ok) {
+      try {
+        const text = await res.text();
+        console.error("Failed to save customers:", text);
+      } catch {
+        console.error("Failed to save customers");
+      }
+    }
+  };
+
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        const res = await fetch("/api/admin/clients", { method: "GET" });
+        if (!res.ok) return;
+        const data = (await res.json()) as Customer[];
+        if (isMounted && Array.isArray(data)) setCustomers(data);
+      } catch {
+        // keep seed
+      }
+    })();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Filter customers
   const filteredCustomers = customers.filter((customer) => {
@@ -112,9 +81,7 @@ export default function CustomersPage() {
       customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       customer.phone.includes(searchTerm);
-    const matchesStatus =
-      statusFilter === "all" || customer.status === statusFilter;
-    return matchesSearch && matchesStatus;
+    return matchesSearch;
   });
 
   const handleAddCustomer = () => {
@@ -124,7 +91,7 @@ export default function CustomersPage() {
       email: "",
       phone: "",
       address: "",
-      status: "" as Customer["status"],
+      image: "",
     });
     openModal();
   };
@@ -136,38 +103,61 @@ export default function CustomersPage() {
       email: customer.email,
       phone: customer.phone,
       address: customer.address,
-      status: customer.status,
+      image: customer.image ?? "",
     });
     openModal();
   };
 
-  const handleDeleteCustomer = (id: number) => {
-    if (confirm("Êtes-vous sûr de vouloir supprimer ce client ?")) {
-      setCustomers(customers.filter((customer) => customer.id !== id));
-    }
+  const handleRequestDeleteCustomer = (customer: Customer) => {
+    setDeletingCustomer(customer);
+    openDeleteModal();
+  };
+
+  const handleConfirmDeleteCustomer = () => {
+    if (!deletingCustomer) return;
+    const nextCustomers = customers.filter(
+      (customer) => customer.id !== deletingCustomer.id
+    );
+    setCustomers(nextCustomers);
+    void saveCustomersToDb(nextCustomers);
+    closeDeleteModal();
+    setDeletingCustomer(null);
   };
 
   const handleSaveCustomer = () => {
+    const trimmedImage = formData.image.trim();
+    const nextFormData = {
+      ...formData,
+      image: trimmedImage.length > 0 ? trimmedImage : undefined,
+    };
+
     if (editingCustomer) {
       // Update existing customer
-      setCustomers(
-        customers.map((customer) =>
-          customer.id === editingCustomer.id
-            ? { ...customer, ...formData }
-            : customer
-        )
+      const nextCustomers = customers.map((customer) =>
+        customer.id === editingCustomer.id
+          ? {
+              ...customer,
+              ...nextFormData,
+            }
+          : customer
       );
+      setCustomers(nextCustomers);
+      void saveCustomersToDb(nextCustomers);
     } else {
       // Add new customer
       const newCustomer: Customer = {
-        id: Math.max(...customers.map((c) => c.id)) + 1,
-        ...formData,
+        id:
+          customers.length > 0
+            ? Math.max(...customers.map((c) => c.id)) + 1
+            : 1,
+        ...nextFormData,
         totalOrders: 0,
         totalSpent: "0 MAD",
         lastOrder: new Date().toISOString().split("T")[0],
-        image: "/images/user/user-01.jpg",
       };
-      setCustomers([...customers, newCustomer]);
+      const nextCustomers = [...customers, newCustomer];
+      setCustomers(nextCustomers);
+      void saveCustomersToDb(nextCustomers);
     }
     closeModal();
   };
@@ -203,41 +193,15 @@ export default function CustomersPage() {
             className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/10 focus:border-brand-300 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700"
           />
         </div>
-        <div className="w-full sm:w-48">
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-theme-xs focus:outline-none focus:ring-2 focus:ring-brand-500/10 focus:border-brand-300 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700"
-          >
-            <option value="all">Tous les Statuts</option>
-            <option value="Active">Actif</option>
-            <option value="VIP">VIP</option>
-            <option value="Inactive">Inactif</option>
-          </select>
-        </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/3">
           <p className="text-sm text-gray-500 dark:text-gray-400">
             Total des Clients
           </p>
           <p className="mt-2 text-2xl font-bold text-gray-800 dark:text-white/90">
             {customers.length}
-          </p>
-        </div>
-        <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/3">
-          <p className="text-sm text-gray-500 dark:text-gray-400">Actifs</p>
-          <p className="mt-2 text-2xl font-bold text-gray-800 dark:text-white/90">
-            {customers.filter((c) => c.status === "Active").length}
-          </p>
-        </div>
-        <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/3">
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            Clients VIP
-          </p>
-          <p className="mt-2 text-2xl font-bold text-gray-800 dark:text-white/90">
-            {customers.filter((c) => c.status === "VIP").length}
           </p>
         </div>
         <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/3">
@@ -297,12 +261,6 @@ export default function CustomersPage() {
                   isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
-                  Statut
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                >
                   Dernière Commande
                 </TableCell>
                 <TableCell
@@ -318,7 +276,7 @@ export default function CustomersPage() {
               {filteredCustomers.length === 0 ? (
                 <TableRow>
                   <TableCell
-                    colSpan={8}
+                    colSpan={7}
                     className="px-5 py-8 text-center text-gray-500 dark:text-gray-400"
                   >
                     Aucun client trouvé
@@ -333,7 +291,7 @@ export default function CustomersPage() {
                           <Image
                             width={40}
                             height={40}
-                            src={customer.image}
+                            src={customer.image ?? DEFAULT_AVATAR}
                             alt={customer.name}
                             className="h-10 w-10 object-cover"
                           />
@@ -369,24 +327,6 @@ export default function CustomersPage() {
                     <TableCell className="px-5 py-3 text-gray-500 text-theme-sm dark:text-gray-400">
                       {customer.totalSpent}
                     </TableCell>
-                    <TableCell className="px-5 py-3">
-                      <Badge
-                        size="sm"
-                        color={
-                          customer.status === "VIP"
-                            ? "info"
-                            : customer.status === "Active"
-                            ? "success"
-                            : "error"
-                        }
-                      >
-                        {customer.status === "Active"
-                          ? "Actif"
-                          : customer.status === "VIP"
-                          ? "VIP"
-                          : "Inactif"}
-                      </Badge>
-                    </TableCell>
                     <TableCell className="px-5 py-3 text-gray-500 text-theme-sm dark:text-gray-400">
                       {customer.lastOrder}
                     </TableCell>
@@ -406,7 +346,7 @@ export default function CustomersPage() {
                           <PencilIcon className="w-4 h-4" />
                         </button>
                         <button
-                          onClick={() => handleDeleteCustomer(customer.id)}
+                          onClick={() => handleRequestDeleteCustomer(customer)}
                           className="p-2 text-red-500 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 dark:text-red-400"
                           title="Supprimer"
                         >
@@ -491,21 +431,19 @@ export default function CustomersPage() {
             />
           </div>
           <div>
-            <Label>Statut</Label>
-            <select
-              value={formData.status}
+            <Label>Image (URL) (optionnel)</Label>
+            <input
+              type="text"
+              placeholder="Ex: /images/user/user-02.jpg ou https://..."
+              value={formData.image}
               onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  status: e.target.value as Customer["status"],
-                })
+                setFormData({ ...formData, image: e.target.value })
               }
-              className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-theme-xs focus:outline-none focus:ring-2 focus:ring-brand-500/10 focus:border-brand-300 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700"
-            >
-              <option value="Active">Actif</option>
-              <option value="VIP">VIP</option>
-              <option value="Inactive">Inactif</option>
-            </select>
+              className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/10 focus:border-brand-300 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700"
+            />
+            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              Si vide, un avatar par défaut sera affiché.
+            </p>
           </div>
           <div className="flex items-center justify-end gap-3 pt-4">
             <Button
@@ -522,6 +460,23 @@ export default function CustomersPage() {
           </div>
         </form>
       </Modal>
+
+      <ConfirmDeleteModal
+        isOpen={isDeleteOpen}
+        onClose={() => {
+          closeDeleteModal();
+          setDeletingCustomer(null);
+        }}
+        onConfirm={handleConfirmDeleteCustomer}
+        title="Supprimer ce client ?"
+        description={
+          deletingCustomer
+            ? `Cette action est irréversible. Client: ${deletingCustomer.name}`
+            : "Cette action est irréversible."
+        }
+        confirmText="Supprimer"
+        cancelText="Annuler"
+      />
     </div>
   );
 }

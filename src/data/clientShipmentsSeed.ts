@@ -1,0 +1,40 @@
+import type { ClientShipment } from "@/types/clientShipment";
+
+export const clientShipmentsSeed: ClientShipment[] = [
+  {
+    id: 1,
+    trackingNumber: "DLV-2024-001",
+    sender: "Atlas Logistique",
+    recipient: "Khadija El Amrani",
+    origin: "Casablanca",
+    destination: "12 Avenue Mohammed V, Rabat 10000",
+    weight: "2,5 kg",
+    status: "En transit",
+    estimatedDelivery: "2026-01-06 14:00",
+    createdAt: "2026-01-04",
+  },
+  {
+    id: 2,
+    trackingNumber: "DLV-2024-002",
+    sender: "Société Maghreb Express",
+    recipient: "Yassine Benali",
+    origin: "Tanger",
+    destination: "Boulevard Hassan II, Marrakech 40000",
+    weight: "5,0 kg",
+    status: "Livré",
+    estimatedDelivery: "2026-01-05 16:00",
+    createdAt: "2026-01-03",
+  },
+  {
+    id: 3,
+    trackingNumber: "DLV-2024-003",
+    sender: "Solutions Atlas",
+    recipient: "Amina El Idrissi",
+    origin: "Fès",
+    destination: "Boulevard Zerktouni, Casablanca 20000",
+    weight: "1,2 kg",
+    status: "En livraison",
+    estimatedDelivery: "2026-01-05 10:00",
+    createdAt: "2026-01-04",
+  },
+];

@@ -23,10 +23,10 @@ export default function RouteMapCard() {
       <div className="flex justify-between">
         <div>
           <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
-            Delivery Routes
+            Itinéraires de livraison
           </h3>
           <p className="mt-1 text-gray-500 text-theme-sm dark:text-gray-400">
-            Active delivery routes by region
+            Itinéraires actifs par région
           </p>
         </div>
 
@@ -71,13 +71,13 @@ export default function RouteMapCard() {
                 width={48}
                 height={48}
                 src="/images/country/country-01.svg"
-                alt="usa"
+                alt="morocco"
                 className="w-full"
               />
             </div>
             <div>
               <p className="font-semibold text-gray-800 text-theme-sm dark:text-white/90">
-                North Region
+                Région Nord
               </p>
               <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
                 1,245 Deliveries
@@ -108,7 +108,7 @@ export default function RouteMapCard() {
             </div>
             <div>
               <p className="font-semibold text-gray-800 text-theme-sm dark:text-white/90">
-                South Region
+                Région Sud
               </p>
               <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
                 589 Deliveries
@@ -129,4 +129,3 @@ export default function RouteMapCard() {
     </div>
   );
 }
-

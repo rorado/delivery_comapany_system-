@@ -10,8 +10,8 @@ export default function ClientProfilePage() {
   const [profileData, setProfileData] = useState({
     name: "Jean Dupont",
     email: "client@fastdeliver.com",
-    phone: "+1 (555) 123-4567",
-    address: "123 Rue Principale, Los Angeles, CA 90001",
+    phone: "+212 6 12 34 56 78",
+    address: "12 Avenue Mohammed V, Rabat 10000",
     company: "ABC Société",
   });
 

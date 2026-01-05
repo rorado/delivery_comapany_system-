@@ -15,12 +15,16 @@ interface PhoneInputProps {
 
 const PhoneInput: React.FC<PhoneInputProps> = ({
   countries,
-  placeholder = "+1 (555) 000-0000",
+  placeholder = "+212 6 00 00 00 00",
   onChange,
   selectPosition = "start", // Default position is 'start'
 }) => {
-  const [selectedCountry, setSelectedCountry] = useState<string>("US");
-  const [phoneNumber, setPhoneNumber] = useState<string>("+1");
+  const [selectedCountry, setSelectedCountry] = useState<string>(
+    countries[0]?.code ?? "MA"
+  );
+  const [phoneNumber, setPhoneNumber] = useState<string>(
+    countries[0]?.label ?? "+212"
+  );
 
   const countryCodes: Record<string, string> = countries.reduce(
     (acc, { code, label }) => ({ ...acc, [code]: label }),

@@ -49,8 +49,8 @@ const CountryMap: React.FC<CountryMapProps> = ({ mapColor }) => {
       markers={
         [
           {
-            latLng: [37.2580397, -104.657039],
-            name: "United States",
+            latLng: [34.0209, -6.84165],
+            name: "Maroc",
             style: {
               fill: "#465FFF",
               borderWidth: 1,
@@ -59,18 +59,18 @@ const CountryMap: React.FC<CountryMapProps> = ({ mapColor }) => {
             },
           },
           {
-            latLng: [20.7504374, 73.7276105],
-            name: "India",
+            latLng: [48.8566, 2.3522],
+            name: "France",
             style: { fill: "#465FFF", borderWidth: 1, borderColor: "white" },
           },
           {
-            latLng: [53.613, -11.6368],
-            name: "United Kingdom",
+            latLng: [40.4168, -3.7038],
+            name: "Espagne",
             style: { fill: "#465FFF", borderWidth: 1, borderColor: "white" },
           },
           {
-            latLng: [-25.0304388, 115.2092761],
-            name: "Sweden",
+            latLng: [36.7538, 3.0588],
+            name: "Algérie",
             style: {
               fill: "#465FFF",
               borderWidth: 1,

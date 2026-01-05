@@ -23,10 +23,10 @@ export default function DemographicCard() {
       <div className="flex justify-between">
         <div>
           <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
-            Customers Demographic
+            Démographie des clients
           </h3>
           <p className="mt-1 text-gray-500 text-theme-sm dark:text-gray-400">
-            Number of customer based on country
+            Nombre de clients par pays
           </p>
         </div>
 
@@ -71,16 +71,16 @@ export default function DemographicCard() {
                 width={48}
                 height={48}
                 src="/images/country/country-01.svg"
-                alt="usa"
+                alt="morocco"
                 className="w-full"
               />
             </div>
             <div>
               <p className="font-semibold text-gray-800 text-theme-sm dark:text-white/90">
-                USA
+                Maroc
               </p>
               <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
-                2,379 Customers
+                2 379 clients
               </span>
             </div>
           </div>

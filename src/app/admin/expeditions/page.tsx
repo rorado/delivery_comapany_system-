@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   Table,
   TableBody,
@@ -13,179 +14,31 @@ import { Modal } from "@/components/ui/modal";
 import { useModal } from "@/hooks/useModal";
 import Button from "@/components/ui/button/Button";
 import Label from "@/components/form/Label";
+import ConfirmDeleteModal from "@/components/common/ConfirmDeleteModal";
 import { Dropdown } from "@/components/ui/dropdown/Dropdown";
 import { DropdownItem } from "@/components/ui/dropdown/DropdownItem";
 import jsPDF from "jspdf";
 
-interface Shipment {
-  id: number;
-  packageNumber: string;
-  sender: string;
-  senderPhone: string;
-  recipient: string;
-  recipientPhone: string;
-  origin: string;
-  destination: string;
-  city: string;
-  address: string;
-  weight: string;
-  product: string;
-  comment: string;
-  price: string;
-  status:
-    | "Pending"
-    | "In Transit"
-    | "Out for Delivery"
-    | "Delivered"
-    | "Failed";
-  driver: string;
-  estimatedDelivery: string;
-  createdAt: string;
-  createdAtTime: string;
-  image: string;
-}
-
-const initialShipments: Shipment[] = [
-  {
-    id: 1,
-    packageNumber: "CASA000201MA",
-    sender: "Atlas Delivery",
-    senderPhone: "0661234567",
-    recipient: "Youssef El Amrani",
-    recipientPhone: "0678452310",
-    origin: "Casablanca – Sidi Maarouf",
-    destination: "Tanger – Malabata",
-    city: "Tanger",
-    address: "45 Boulevard Mohammed VI, Malabata",
-    weight: "2.5 kg",
-    product: "Electronics",
-    comment: "",
-    price: "80 DH",
-    status: "In Transit",
-    driver: "Ahmed Benali",
-    estimatedDelivery: "2026-01-15",
-    createdAt: "31-12-2025",
-    createdAtTime: "09:12",
-    image: "",
-  },
-  {
-    id: 2,
-    packageNumber: "CASA000202MA",
-    sender: "Atlas Delivery",
-    senderPhone: "0661234567",
-    recipient: "Khadija Zahraoui",
-    recipientPhone: "0698123456",
-    origin: "Rabat – Agdal",
-    destination: "Casablanca – Bourgogne",
-    city: "Casablanca",
-    address: "12 Rue Ahmed Chawki, Bourgogne",
-    weight: "5.0 kg",
-    product: "Home Appliances",
-    comment: "Handle with care",
-    price: "120 DH",
-    status: "Out for Delivery",
-    driver: "Hassan El Idrissi",
-    estimatedDelivery: "2026-01-12",
-    createdAt: "30-12-2025",
-    createdAtTime: "14:30",
-    image: "",
-  },
-  {
-    id: 3,
-    packageNumber: "RAB000203MA",
-    sender: "Atlas Delivery",
-    senderPhone: "0661234567",
-    recipient: "Mohamed Ait Lahcen",
-    recipientPhone: "0612349876",
-    origin: "Meknes – Hamria",
-    destination: "Rabat – Hay Riad",
-    city: "Rabat",
-    address: "78 Avenue Annakhil, Hay Riad",
-    weight: "1.2 kg",
-    product: "Documents",
-    comment: "Urgent delivery",
-    price: "40 DH",
-    status: "Delivered",
-    driver: "Yassine Mouline",
-    estimatedDelivery: "2026-01-11",
-    createdAt: "29-12-2025",
-    createdAtTime: "10:45",
-    image: "",
-  },
-  {
-    id: 4,
-    packageNumber: "MRK000204MA",
-    sender: "Atlas Delivery",
-    senderPhone: "0661234567",
-    recipient: "Fatima Ezzahra Bennis",
-    recipientPhone: "0687456123",
-    origin: "Casablanca – Ain Sebaa",
-    destination: "Marrakech – Gueliz",
-    city: "Marrakech",
-    address: "210 Avenue Mohammed V, Gueliz",
-    weight: "8.5 kg",
-    product: "Furniture",
-    comment: "",
-    price: "250 DH",
-    status: "Pending",
-    driver: "Omar Chafik",
-    estimatedDelivery: "2026-01-18",
-    createdAt: "28-12-2025",
-    createdAtTime: "16:20",
-    image: "",
-  },
-  {
-    id: 5,
-    packageNumber: "FES000205MA",
-    sender: "Atlas Delivery",
-    senderPhone: "0661234567",
-    recipient: "Abdelilah Skalli",
-    recipientPhone: "0623457891",
-    origin: "Fes – Ville Nouvelle",
-    destination: "Meknes – Toulal",
-    city: "Fes",
-    address: "33 Rue Allal Ben Abdellah",
-    weight: "3.8 kg",
-    product: "Clothing",
-    comment: "Fragile",
-    price: "70 DH",
-    status: "Delivered",
-    driver: "Rachid Ouhmid",
-    estimatedDelivery: "2026-01-10",
-    createdAt: "27-12-2025",
-    createdAtTime: "11:15",
-    image: "",
-  },
-  {
-    id: 6,
-    packageNumber: "AGA000206MA",
-    sender: "Atlas Delivery",
-    senderPhone: "0661234567",
-    recipient: "Samira El Fassi",
-    recipientPhone: "0609876543",
-    origin: "Marrakech – Sidi Youssef",
-    destination: "Agadir – Talborjt",
-    city: "Agadir",
-    address: "90 Avenue du 20 Août, Talborjt",
-    weight: "6.2 kg",
-    product: "Food Items",
-    comment: "Keep refrigerated",
-    price: "110 DH",
-    status: "In Transit",
-    driver: "Said Azzouzi",
-    estimatedDelivery: "2026-01-16",
-    createdAt: "26-12-2025",
-    createdAtTime: "13:00",
-    image: "",
-  },
-];
+import type { Shipment } from "@/types/expedition";
+import { adminExpeditionsSeed } from "@/data/adminExpeditionsSeed";
 
 export default function ShipmentsPage() {
-  const [shipments, setShipments] = useState<Shipment[]>(initialShipments);
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const router = useRouter();
+  const lastUrlStatus = useRef<string | null>(null);
+  const lastUrlNew = useRef<string | null>(null);
+  const isColisRoute = pathname.startsWith("/admin/colis");
+  const [shipments, setShipments] = useState<Shipment[]>(adminExpeditionsSeed);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const { isOpen, openModal, closeModal } = useModal();
+  const {
+    isOpen: isDeleteOpen,
+    openModal: openDeleteModal,
+    closeModal: closeDeleteModal,
+  } = useModal();
   const {
     isOpen: isDetailOpen,
     openModal: openDetailModal,
@@ -193,6 +46,9 @@ export default function ShipmentsPage() {
   } = useModal();
   const [editingShipment, setEditingShipment] = useState<Shipment | null>(null);
   const [viewingShipment, setViewingShipment] = useState<Shipment | null>(null);
+  const [deletingShipment, setDeletingShipment] = useState<Shipment | null>(
+    null
+  );
   const [formData, setFormData] = useState({
     sender: "",
     senderPhone: "",
@@ -209,9 +65,32 @@ export default function ShipmentsPage() {
     driver: "",
     estimatedDelivery: "",
     status: "Pending" as Shipment["status"],
-    image: "",
   });
-  const [imagePreview, setImagePreview] = useState<string>("");
+
+  const saveShipmentsToDb = async (nextShipments: Shipment[]) => {
+    await fetch("/api/admin/expeditions", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(nextShipments),
+    });
+  };
+
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        const res = await fetch("/api/admin/expeditions", { method: "GET" });
+        if (!res.ok) return;
+        const data = (await res.json()) as Shipment[];
+        if (isMounted && Array.isArray(data)) setShipments(data);
+      } catch {
+        // keep seed
+      }
+    })();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const toggleFilter = () => {
     setIsFilterOpen(!isFilterOpen);
@@ -237,7 +116,7 @@ export default function ShipmentsPage() {
     return matchesSearch && matchesStatus;
   });
 
-  const handleAddShipment = () => {
+  const handleAddShipment = useCallback(() => {
     setEditingShipment(null);
     setFormData({
       sender: "Deliverio",
@@ -255,11 +134,47 @@ export default function ShipmentsPage() {
       driver: "",
       estimatedDelivery: "",
       status: "Pending",
-      image: "",
     });
-    setImagePreview("");
     openModal();
-  };
+  }, [openModal]);
+
+  const handleAddColis = useCallback(() => {
+    router.push("/admin/colis/nouveau");
+  }, [router]);
+
+  useEffect(() => {
+    if (!isColisRoute) return;
+
+    if (pathname.endsWith("/ramassage")) {
+      setStatusFilter("Pending");
+      return;
+    }
+
+    if (pathname.endsWith("/liste")) {
+      setStatusFilter("all");
+    }
+  }, [isColisRoute, pathname]);
+
+  useEffect(() => {
+    const urlStatus = searchParams.get("status");
+    const urlNew = searchParams.get("new");
+
+    if (urlStatus !== lastUrlStatus.current) {
+      setStatusFilter(urlStatus ?? "all");
+      lastUrlStatus.current = urlStatus;
+    }
+
+    if (urlNew !== lastUrlNew.current) {
+      if (urlNew === "1") {
+        if (isColisRoute) {
+          router.replace("/admin/colis/nouveau");
+        } else {
+          handleAddShipment();
+        }
+      }
+      lastUrlNew.current = urlNew;
+    }
+  }, [handleAddShipment, isColisRoute, router, searchParams]);
 
   const handleEditShipment = (shipment: Shipment) => {
     setEditingShipment(shipment);
@@ -279,29 +194,22 @@ export default function ShipmentsPage() {
       driver: shipment.driver,
       estimatedDelivery: shipment.estimatedDelivery,
       status: shipment.status,
-      image: shipment.image,
     });
-    setImagePreview(shipment.image);
     openModal();
   };
 
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const result = reader.result as string;
-        setFormData({ ...formData, image: result });
-        setImagePreview(result);
-      };
-      reader.readAsDataURL(file);
-    }
+  const handleRequestDeleteShipment = (shipment: Shipment) => {
+    setDeletingShipment(shipment);
+    openDeleteModal();
   };
 
-  const handleDeleteShipment = (id: number) => {
-    if (confirm("Êtes-vous sûr de vouloir supprimer cet envoi ?")) {
-      setShipments(shipments.filter((shipment) => shipment.id !== id));
-    }
+  const handleConfirmDeleteShipment = () => {
+    if (!deletingShipment) return;
+    const nextShipments = shipments.filter((s) => s.id !== deletingShipment.id);
+    setShipments(nextShipments);
+    void saveShipmentsToDb(nextShipments);
+    closeDeleteModal();
+    setDeletingShipment(null);
   };
 
   const handleViewPackage = (shipment: Shipment) => {
@@ -411,19 +319,19 @@ export default function ShipmentsPage() {
   const handleSaveShipment = () => {
     if (editingShipment) {
       // Update existing shipment
-      setShipments(
-        shipments.map((shipment) =>
-          shipment.id === editingShipment.id
-            ? {
-                ...shipment,
-                ...formData,
-                packageNumber: shipment.packageNumber,
-                createdAt: shipment.createdAt,
-                createdAtTime: shipment.createdAtTime,
-              }
-            : shipment
-        )
+      const nextShipments = shipments.map((shipment) =>
+        shipment.id === editingShipment.id
+          ? {
+              ...shipment,
+              ...formData,
+              packageNumber: shipment.packageNumber,
+              createdAt: shipment.createdAt,
+              createdAtTime: shipment.createdAtTime,
+            }
+          : shipment
       );
+      setShipments(nextShipments);
+      void saveShipmentsToDb(nextShipments);
     } else {
       // Add new shipment
       const newId =
@@ -445,7 +353,9 @@ export default function ShipmentsPage() {
         createdAt: dateStr,
         createdAtTime: timeStr,
       };
-      setShipments([...shipments, newShipment]);
+      const nextShipments = [...shipments, newShipment];
+      setShipments(nextShipments);
+      void saveShipmentsToDb(nextShipments);
     }
     closeModal();
   };
@@ -462,13 +372,33 @@ export default function ShipmentsPage() {
             page.
           </p>
         </div>
-        <button
-          onClick={handleAddShipment}
-          className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/3 dark:hover:text-gray-200"
-        >
-          <PlusIcon className="w-4 h-4" />
-          Nouvelle expédition
-        </button>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+          {isColisRoute && (
+            <>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => router.push("/admin/colis/liste")}
+              >
+                Liste des colis
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => router.push("/admin/colis/ramassage")}
+              >
+                Colis pour ramassage
+              </Button>
+            </>
+          )}
+          <button
+            onClick={isColisRoute ? handleAddColis : handleAddShipment}
+            className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/3 dark:hover:text-gray-200"
+          >
+            <PlusIcon className="w-4 h-4" />
+            Ajouter un nouveau colis
+          </button>
+        </div>
       </div>
 
       {/* Search and Filter */}
@@ -622,12 +552,6 @@ export default function ShipmentsPage() {
                   isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
-                  Image
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                >
                   N° de suivi
                 </TableCell>
                 <TableCell
@@ -679,7 +603,7 @@ export default function ShipmentsPage() {
               {filteredShipments.length === 0 ? (
                 <TableRow>
                   <TableCell
-                    colSpan={9}
+                    colSpan={8}
                     className="px-5 py-8 text-center text-gray-500 dark:text-gray-400"
                   >
                     Aucune expédition trouvée
@@ -688,31 +612,6 @@ export default function ShipmentsPage() {
               ) : (
                 filteredShipments.map((shipment) => (
                   <TableRow key={shipment.id}>
-                    <TableCell className="px-5 py-3">
-                      {shipment.image ? (
-                        <img
-                          src={shipment.image}
-                          alt={shipment.packageNumber}
-                          className="w-16 h-16 object-cover rounded-lg"
-                        />
-                      ) : (
-                        <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center">
-                          <svg
-                            className="w-8 h-8 text-gray-400"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                            />
-                          </svg>
-                        </div>
-                      )}
-                    </TableCell>
                     <TableCell className="px-5 py-3">
                       <div>
                         <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
@@ -813,7 +712,7 @@ export default function ShipmentsPage() {
                           <PencilIcon className="w-4 h-4" />
                         </button>
                         <button
-                          onClick={() => handleDeleteShipment(shipment.id)}
+                          onClick={() => handleRequestDeleteShipment(shipment)}
                           className="p-2 text-red-500 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 dark:text-red-400"
                           title="Supprimer"
                         >
@@ -909,21 +808,6 @@ export default function ShipmentsPage() {
                   </p>
                 </div>
 
-                {viewingShipment.image && (
-                  <div>
-                    <h5 className="mb-2 font-semibold text-gray-800 dark:text-white/90">
-                      Image du colis
-                    </h5>
-                    <div className="w-full overflow-hidden rounded-lg border border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800">
-                      <img
-                        src={viewingShipment.image}
-                        alt={viewingShipment.packageNumber}
-                        className="h-auto max-h-80 w-full object-contain"
-                      />
-                    </div>
-                  </div>
-                )}
-
                 <div>
                   <p className="text-gray-600 dark:text-gray-400">
                     Produit : {viewingShipment.product}
@@ -981,38 +865,6 @@ export default function ShipmentsPage() {
             className="flex flex-col flex-1 min-h-0"
           >
             <div className="flex-1 overflow-y-auto pr-2 space-y-6 custom-scrollbar">
-              {/* Image Section */}
-              <div className="space-y-4">
-                <h5 className="text-sm font-semibold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 pb-2">
-                  Image du colis
-                </h5>
-                <div>
-                  <Label>Télécharger une image</Label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    className="focus:border-ring-brand-300 h-11 w-full overflow-hidden rounded-lg border border-gray-300 bg-transparent text-sm text-gray-500 shadow-theme-xs 
-                    transition-colors file:mr-5 file:border-collapse file:cursor-pointer file:rounded-l-lg file:border-0 file:border-r file:border-solid file:border-gray-200
-                     file:bg-gray-50 file:py-3 file:pl-3.5 file:pr-3 file:text-sm file:text-gray-700 placeholder:text-gray-400 hover:file:bg-gray-100 focus:outline-hidden
-                      focus:file:ring-brand-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400 dark:file:border-gray-800
-                       dark:file:bg-white/3 dark:file:text-gray-400 dark:placeholder:text-gray-400"
-                  />
-                  {imagePreview && (
-                    <div className="mt-3">
-                      <Label>Aperçu</Label>
-                      <div className="mt-2">
-                        <img
-                          src={imagePreview}
-                          alt="Aperçu"
-                          className="w-32 h-32 object-cover rounded-lg border border-gray-300 dark:border-gray-700"
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-
               {/* Sender Section */}
               <div className="space-y-4">
                 <h5 className="text-sm font-semibold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700 pb-2">
@@ -1292,6 +1144,23 @@ export default function ShipmentsPage() {
           </form>
         </div>
       </Modal>
+
+      <ConfirmDeleteModal
+        isOpen={isDeleteOpen}
+        onClose={() => {
+          closeDeleteModal();
+          setDeletingShipment(null);
+        }}
+        onConfirm={handleConfirmDeleteShipment}
+        title="Supprimer cet envoi ?"
+        description={
+          deletingShipment
+            ? `Cette action est irréversible. Colis: ${deletingShipment.packageNumber}`
+            : "Cette action est irréversible."
+        }
+        confirmText="Supprimer"
+        cancelText="Annuler"
+      />
     </div>
   );
 }

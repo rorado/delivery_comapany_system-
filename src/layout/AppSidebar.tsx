@@ -37,8 +37,21 @@ const navItems: NavItem[] = [
   },
   {
     icon: <BoxIconLine />,
-    name: "Expéditions",
-    path: "/admin/expeditions",
+    name: "Colis",
+    subItems: [
+      { name: "Liste des colis", path: "/admin/colis/liste", pro: false },
+      {
+        name: "Ajouter un nouveau colis",
+        path: "/admin/colis/nouveau",
+        pro: false,
+        new: true,
+      },
+      {
+        name: "Colis pour ramassage",
+        path: "/admin/colis/ramassage",
+        pro: false,
+      },
+    ],
   },
   {
     icon: <UserCircleIcon />,

@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -13,101 +13,23 @@ import { Modal } from "@/components/ui/modal";
 import { useModal } from "@/hooks/useModal";
 import Button from "@/components/ui/button/Button";
 import Label from "@/components/form/Label";
+import ConfirmDeleteModal from "@/components/common/ConfirmDeleteModal";
 
-interface Vehicle {
-  id: number;
-  vehicleNumber: string;
-  type: string;
-  model: string;
-  year: number;
-  driver: string;
-  status: "Active" | "In Use" | "Maintenance" | "Available";
-  mileage: string;
-  lastService: string;
-  capacity: string;
-}
-
-const initialVehicles: Vehicle[] = [
-  {
-    id: 1,
-    vehicleNumber: "DLV-001",
-    type: "Truck",
-    model: "Ford F-150",
-    year: 2022,
-    driver: "Mike Johnson",
-    status: "In Use",
-    mileage: "45,230 km",
-    lastService: "2024-01-05",
-    capacity: "2,500 kg",
-  },
-  {
-    id: 2,
-    vehicleNumber: "DLV-002",
-    type: "Van",
-    model: "Mercedes Sprinter",
-    year: 2023,
-    driver: "David Brown",
-    status: "Active",
-    mileage: "12,450 km",
-    lastService: "2024-01-10",
-    capacity: "1,800 kg",
-  },
-  {
-    id: 3,
-    vehicleNumber: "DLV-003",
-    type: "Truck",
-    model: "Chevrolet Silverado",
-    year: 2021,
-    driver: "James Wilson",
-    status: "In Use",
-    mileage: "67,890 km",
-    lastService: "2023-12-20",
-    capacity: "2,800 kg",
-  },
-  {
-    id: 4,
-    vehicleNumber: "DLV-004",
-    type: "Van",
-    model: "Ford Transit",
-    year: 2023,
-    driver: "Michael Lee",
-    status: "Maintenance",
-    mileage: "8,920 km",
-    lastService: "2024-01-08",
-    capacity: "1,500 kg",
-  },
-  {
-    id: 5,
-    vehicleNumber: "DLV-005",
-    type: "Truck",
-    model: "Ram 1500",
-    year: 2022,
-    driver: "Chris Anderson",
-    status: "Active",
-    mileage: "38,560 km",
-    lastService: "2024-01-02",
-    capacity: "2,200 kg",
-  },
-  {
-    id: 6,
-    vehicleNumber: "DLV-006",
-    type: "Van",
-    model: "Nissan NV200",
-    year: 2024,
-    driver: "Available",
-    status: "Available",
-    mileage: "2,340 km",
-    lastService: "2024-01-01",
-    capacity: "1,200 kg",
-  },
-];
+import type { Vehicle } from "@/types/vehicle";
+import { adminVehiclesSeed } from "@/data/adminVehiclesSeed";
 
 export default function VehiclesPage() {
-  const [vehicles, setVehicles] = useState<Vehicle[]>(initialVehicles);
+  const [vehicles, setVehicles] = useState<Vehicle[]>(adminVehiclesSeed);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const { isOpen, openModal, closeModal } = useModal();
+  const {
+    isOpen: isDeleteOpen,
+    openModal: openDeleteModal,
+    closeModal: closeDeleteModal,
+  } = useModal();
   const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null);
+  const [deletingVehicle, setDeletingVehicle] = useState<Vehicle | null>(null);
   const [formData, setFormData] = useState({
     vehicleNumber: "",
     type: "",
@@ -120,13 +42,39 @@ export default function VehiclesPage() {
     capacity: "",
   });
 
+  const saveVehiclesToDb = async (nextVehicles: Vehicle[]) => {
+    await fetch("/api/admin/vehicles", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(nextVehicles),
+    });
+  };
+
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        const res = await fetch("/api/admin/vehicles", { method: "GET" });
+        if (!res.ok) return;
+        const data = (await res.json()) as Vehicle[];
+        if (isMounted && Array.isArray(data)) setVehicles(data);
+      } catch {
+        // keep seed
+      }
+    })();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   // Filter vehicles
   const filteredVehicles = vehicles.filter((vehicle) => {
     const matchesSearch =
       vehicle.vehicleNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
       vehicle.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
       vehicle.driver.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === "all" || vehicle.status === statusFilter;
+    const matchesStatus =
+      statusFilter === "all" || vehicle.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
@@ -162,29 +110,37 @@ export default function VehiclesPage() {
     openModal();
   };
 
-  const handleDeleteVehicle = (id: number) => {
-    if (confirm("Are you sure you want to delete this vehicle?")) {
-      setVehicles(vehicles.filter((vehicle) => vehicle.id !== id));
-    }
+  const handleRequestDeleteVehicle = (vehicle: Vehicle) => {
+    setDeletingVehicle(vehicle);
+    openDeleteModal();
+  };
+
+  const handleConfirmDeleteVehicle = () => {
+    if (!deletingVehicle) return;
+    const nextVehicles = vehicles.filter((v) => v.id !== deletingVehicle.id);
+    setVehicles(nextVehicles);
+    void saveVehiclesToDb(nextVehicles);
+    closeDeleteModal();
+    setDeletingVehicle(null);
   };
 
   const handleSaveVehicle = () => {
     if (editingVehicle) {
       // Update existing vehicle
-      setVehicles(
-        vehicles.map((vehicle) =>
-          vehicle.id === editingVehicle.id
-            ? { ...vehicle, ...formData }
-            : vehicle
-        )
+      const nextVehicles = vehicles.map((vehicle) =>
+        vehicle.id === editingVehicle.id ? { ...vehicle, ...formData } : vehicle
       );
+      setVehicles(nextVehicles);
+      void saveVehiclesToDb(nextVehicles);
     } else {
       // Add new vehicle
       const newVehicle: Vehicle = {
         id: Math.max(...vehicles.map((v) => v.id)) + 1,
         ...formData,
       };
-      setVehicles([...vehicles, newVehicle]);
+      const nextVehicles = [...vehicles, newVehicle];
+      setVehicles(nextVehicles);
+      void saveVehiclesToDb(nextVehicles);
     }
     closeModal();
   };
@@ -202,7 +158,7 @@ export default function VehiclesPage() {
         </div>
         <button
           onClick={handleAddVehicle}
-          className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"
+          className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/3 dark:hover:text-gray-200"
         >
           <PlusIcon className="w-4 h-4" />
           Add Vehicle
@@ -235,7 +191,7 @@ export default function VehiclesPage() {
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/3">
         <div className="max-w-full overflow-x-auto">
           <Table>
             <TableHeader className="border-b border-gray-100 dark:border-gray-800">
@@ -300,7 +256,10 @@ export default function VehiclesPage() {
             <TableBody className="divide-y divide-gray-100 dark:divide-gray-800">
               {filteredVehicles.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={9} className="px-5 py-8 text-center text-gray-500 dark:text-gray-400">
+                  <TableCell
+                    colSpan={9}
+                    className="px-5 py-8 text-center text-gray-500 dark:text-gray-400"
+                  >
                     No vehicles found
                   </TableCell>
                 </TableRow>
@@ -332,7 +291,8 @@ export default function VehiclesPage() {
                       <Badge
                         size="sm"
                         color={
-                          vehicle.status === "Active" || vehicle.status === "In Use"
+                          vehicle.status === "Active" ||
+                          vehicle.status === "In Use"
                             ? "success"
                             : vehicle.status === "Available"
                             ? "info"
@@ -361,7 +321,7 @@ export default function VehiclesPage() {
                           <PencilIcon className="w-4 h-4" />
                         </button>
                         <button
-                          onClick={() => handleDeleteVehicle(vehicle.id)}
+                          onClick={() => handleRequestDeleteVehicle(vehicle)}
                           className="p-2 text-red-500 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 dark:text-red-400"
                           title="Delete"
                         >
@@ -400,7 +360,9 @@ export default function VehiclesPage() {
                 type="text"
                 placeholder="e.g., DLV-001"
                 value={formData.vehicleNumber}
-                onChange={(e) => setFormData({ ...formData, vehicleNumber: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, vehicleNumber: e.target.value })
+                }
                 required
                 className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/10 focus:border-brand-300 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700"
               />
@@ -409,7 +371,9 @@ export default function VehiclesPage() {
               <Label>Type</Label>
               <select
                 value={formData.type}
-                onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, type: e.target.value })
+                }
                 required
                 className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-theme-xs focus:outline-none focus:ring-2 focus:ring-brand-500/10 focus:border-brand-300 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700"
               >
@@ -425,7 +389,9 @@ export default function VehiclesPage() {
                 type="text"
                 placeholder="e.g., Ford F-150"
                 value={formData.model}
-                onChange={(e) => setFormData({ ...formData, model: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, model: e.target.value })
+                }
                 required
                 className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/10 focus:border-brand-300 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700"
               />
@@ -436,7 +402,9 @@ export default function VehiclesPage() {
                 type="number"
                 placeholder="e.g., 2024"
                 value={formData.year}
-                onChange={(e) => setFormData({ ...formData, year: parseInt(e.target.value) })}
+                onChange={(e) =>
+                  setFormData({ ...formData, year: parseInt(e.target.value) })
+                }
                 required
                 min="2000"
                 max={new Date().getFullYear() + 1}
@@ -449,7 +417,9 @@ export default function VehiclesPage() {
                 type="text"
                 placeholder="Enter driver name"
                 value={formData.driver}
-                onChange={(e) => setFormData({ ...formData, driver: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, driver: e.target.value })
+                }
                 required
                 className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/10 focus:border-brand-300 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700"
               />
@@ -459,7 +429,10 @@ export default function VehiclesPage() {
               <select
                 value={formData.status}
                 onChange={(e) =>
-                  setFormData({ ...formData, status: e.target.value as Vehicle["status"] })
+                  setFormData({
+                    ...formData,
+                    status: e.target.value as Vehicle["status"],
+                  })
                 }
                 className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-theme-xs focus:outline-none focus:ring-2 focus:ring-brand-500/10 focus:border-brand-300 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700"
               >
@@ -475,7 +448,9 @@ export default function VehiclesPage() {
                 type="text"
                 placeholder="e.g., 45,230 km"
                 value={formData.mileage}
-                onChange={(e) => setFormData({ ...formData, mileage: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, mileage: e.target.value })
+                }
                 required
                 className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/10 focus:border-brand-300 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700"
               />
@@ -485,7 +460,9 @@ export default function VehiclesPage() {
               <input
                 type="date"
                 value={formData.lastService}
-                onChange={(e) => setFormData({ ...formData, lastService: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, lastService: e.target.value })
+                }
                 required
                 className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/10 focus:border-brand-300 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700"
               />
@@ -496,14 +473,21 @@ export default function VehiclesPage() {
                 type="text"
                 placeholder="e.g., 2,500 kg"
                 value={formData.capacity}
-                onChange={(e) => setFormData({ ...formData, capacity: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, capacity: e.target.value })
+                }
                 required
                 className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/10 focus:border-brand-300 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700"
               />
             </div>
           </div>
           <div className="flex items-center justify-end gap-3 pt-4">
-            <Button type="button" size="sm" variant="outline" onClick={closeModal}>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={closeModal}
+            >
               Cancel
             </Button>
             <Button type="submit" size="sm">
@@ -512,6 +496,23 @@ export default function VehiclesPage() {
           </div>
         </form>
       </Modal>
+
+      <ConfirmDeleteModal
+        isOpen={isDeleteOpen}
+        onClose={() => {
+          closeDeleteModal();
+          setDeletingVehicle(null);
+        }}
+        onConfirm={handleConfirmDeleteVehicle}
+        title="Delete this vehicle?"
+        description={
+          deletingVehicle
+            ? `This action cannot be undone. Vehicle: ${deletingVehicle.vehicleNumber}`
+            : "This action cannot be undone."
+        }
+        confirmText="Delete"
+        cancelText="Cancel"
+      />
     </div>
   );
 }
