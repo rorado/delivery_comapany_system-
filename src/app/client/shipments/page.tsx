@@ -7,7 +7,6 @@ import Link from "next/link";
 import Button from "../../../components/ui/button/Button";
 
 import type { ClientShipment } from "../../../types/clientShipment";
-import { clientShipmentsSeed } from "../../../data/clientShipmentsSeed";
 
 export default function MyShipmentsPage() {
   const searchParams = useSearchParams();
@@ -16,8 +15,7 @@ export default function MyShipmentsPage() {
   const lastUrlStatus = useRef<string | null>(null);
   const lastUrlNew = useRef<string | null>(null);
   const isColisRoute = pathname.startsWith("/client/colis");
-  const [shipments, setShipments] =
-    useState<ClientShipment[]>(clientShipmentsSeed);
+  const [shipments, setShipments] = useState<ClientShipment[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
@@ -34,11 +32,11 @@ export default function MyShipmentsPage() {
     (async () => {
       try {
         const res = await fetch("/api/client/shipments", { method: "GET" });
-        if (!res.ok) return;
+        if (!res.ok) throw new Error("Failed to fetch");
         const data = (await res.json()) as ClientShipment[];
         if (isMounted && Array.isArray(data)) setShipments(data);
       } catch {
-        // keep seed
+        if (isMounted) setShipments([]);
       }
     })();
     return () => {

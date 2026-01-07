@@ -1,24 +1,95 @@
 "use client";
-import { useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Button from "@/components/ui/button/Button";
 import Label from "@/components/form/Label";
-import { PencilIcon, MailIcon, BoxIconLine } from "@/icons";
+import { PencilIcon } from "@/icons";
+
+type ClientProfile = {
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  company: string;
+};
 
 export default function ClientProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
-  const [profileData, setProfileData] = useState({
-    name: "Jean Dupont",
-    email: "client@fastdeliver.com",
-    phone: "+212 6 12 34 56 78",
-    address: "12 Avenue Mohammed V, Rabat 10000",
-    company: "ABC Société",
-  });
+  const defaultProfile = useMemo<ClientProfile>(
+    () => ({
+      name: "Jean Dupont",
+      email: "client@fastdeliver.com",
+      phone: "+212 6 12 34 56 78",
+      address: "12 Avenue Mohammed V, Rabat 10000",
+      company: "ABC Société",
+    }),
+    []
+  );
 
-  const handleSave = () => {
+  const [profileData, setProfileData] = useState<ClientProfile>(defaultProfile);
+  const [savedProfile, setSavedProfile] =
+    useState<ClientProfile>(defaultProfile);
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const res = await fetch("/api/client/profile", {
+          method: "GET",
+          headers: { Accept: "application/json" },
+        });
+        if (!res.ok) return;
+        const data = (await res.json()) as ClientProfile;
+        if (!mounted) return;
+        if (data && typeof data === "object") {
+          setProfileData(data);
+          setSavedProfile(data);
+        }
+      } catch {
+        // keep defaults
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, [defaultProfile]);
+
+  const handleSave = useCallback(async () => {
+    setIsSaving(true);
+    try {
+      const res = await fetch("/api/client/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(profileData),
+      });
+
+      if (!res.ok) {
+        let details = "";
+        try {
+          details = await res.text();
+        } catch {
+          // ignore
+        }
+        throw new Error(details || `HTTP ${res.status}`);
+      }
+
+      const saved = (await res.json()) as ClientProfile;
+      setSavedProfile(saved);
+      setProfileData(saved);
+      setIsEditing(false);
+    } catch (e) {
+      const message = e instanceof Error ? e.message : String(e);
+      window.alert(`Erreur: impossible d'enregistrer le profil (${message})`);
+    } finally {
+      setIsSaving(false);
+    }
+  }, [profileData]);
+
+  const handleCancel = useCallback(() => {
+    setProfileData(savedProfile);
     setIsEditing(false);
-    // In production, save to backend
-  };
+  }, [savedProfile]);
 
   return (
     <div className="space-y-6">
@@ -98,7 +169,7 @@ export default function ClientProfilePage() {
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                handleSave();
+                void handleSave();
               }}
               className="space-y-5"
             >
@@ -203,14 +274,15 @@ export default function ClientProfilePage() {
               </div>
               {isEditing && (
                 <div className="flex items-center gap-3 pt-4">
-                  <Button type="submit" size="sm">
+                  <Button type="submit" size="sm" disabled={isSaving}>
                     Enregistrer les modifications
                   </Button>
                   <Button
                     type="button"
                     size="sm"
                     variant="outline"
-                    onClick={() => setIsEditing(false)}
+                    onClick={handleCancel}
+                    disabled={isSaving}
                   >
                     Annuler
                   </Button>
@@ -220,7 +292,7 @@ export default function ClientProfilePage() {
           </div>
 
           {/* Account Settings */}
-          <div className="mt-6 rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/3">
+          {/* <div className="mt-6 rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/3">
             <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4">
               Paramètres du compte
             </h3>
@@ -240,7 +312,7 @@ export default function ClientProfilePage() {
                     className="sr-only peer"
                     defaultChecked
                   />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-brand-300 dark:peer-focus:ring-brand-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-brand-600"></div>
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-brand-300 dark:peer-focus:ring-brand-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-brand-600"></div>
                 </label>
               </div>
               <div className="flex items-center justify-between">
@@ -254,11 +326,11 @@ export default function ClientProfilePage() {
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input type="checkbox" className="sr-only peer" />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-brand-300 dark:peer-focus:ring-brand-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-brand-600"></div>
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-brand-300 dark:peer-focus:ring-brand-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-brand-600"></div>
                 </label>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

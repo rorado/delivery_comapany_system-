@@ -42,7 +42,7 @@ export default function DriversPage() {
   });
 
   const saveDriversToDb = async (nextDrivers: Driver[]) => {
-    await fetch("/api/admin/chauffeurs", {
+    await fetch("/api/admin/livreurs", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(nextDrivers),
@@ -53,7 +53,7 @@ export default function DriversPage() {
     let isMounted = true;
     (async () => {
       try {
-        const res = await fetch("/api/admin/chauffeurs", { method: "GET" });
+        const res = await fetch("/api/admin/livreurs", { method: "GET" });
         if (!res.ok) return;
         const data = (await res.json()) as Driver[];
         if (isMounted && Array.isArray(data)) setDrivers(data);
@@ -144,11 +144,10 @@ export default function DriversPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-800 dark:text-white/90">
-            Gestion des Chauffeurs
+            Gestion des Livreurs
           </h1>
           <p className="mt-1 text-gray-500 dark:text-gray-400">
-            Gérez les chauffeurs de livraison, leurs horaires et leurs
-            performances.
+            Gérez les livreurs, leurs horaires et leurs performances.
           </p>
         </div>
         <button
@@ -156,7 +155,7 @@ export default function DriversPage() {
           className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/3 dark:hover:text-gray-200"
         >
           <PlusIcon className="w-4 h-4" />
-          Ajouter un Chauffeur
+          Ajouter un Livreur
         </button>
       </div>
 
@@ -165,7 +164,7 @@ export default function DriversPage() {
         <div className="flex-1">
           <input
             type="text"
-            placeholder="Rechercher les chauffeurs par nom, email ou téléphone..."
+            placeholder="Rechercher les livreurs par nom, email ou téléphone..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/10 focus:border-brand-300 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700 dark:placeholder:text-white/30 dark:focus:border-brand-800"
@@ -190,7 +189,7 @@ export default function DriversPage() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
         <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/3">
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            Nombre total de chauffeurs
+            Nombre total de livreurs
           </p>
           <p className="mt-2 text-2xl font-bold text-gray-800 dark:text-white/90">
             {drivers.length}
@@ -238,7 +237,7 @@ export default function DriversPage() {
                   isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
-                  Chauffeur
+                  Livreur
                 </TableCell>
                 <TableCell
                   isHeader
@@ -286,7 +285,7 @@ export default function DriversPage() {
                     colSpan={7}
                     className="px-5 py-8 text-center text-gray-500 dark:text-gray-400"
                   >
-                    Aucun chauffeur trouvé
+                    Aucun livreur trouvé
                   </TableCell>
                 </TableRow>
               ) : (
@@ -391,7 +390,7 @@ export default function DriversPage() {
         className="max-w-[600px] p-5 lg:p-10"
       >
         <h4 className="mb-6 text-lg font-semibold text-gray-800 dark:text-white/90">
-          {editingDriver ? "Modifier le chauffeur" : "Ajouter un chauffeur"}
+          {editingDriver ? "Modifier le livreur" : "Ajouter un livreur"}
         </h4>
 
         <form
@@ -405,7 +404,7 @@ export default function DriversPage() {
             <Label>Nom complet</Label>
             <input
               type="text"
-              placeholder="Entrez le nom du chauffeur"
+              placeholder="Entrez le nom du livreur"
               value={formData.name}
               onChange={(e) =>
                 setFormData({ ...formData, name: e.target.value })
@@ -499,10 +498,10 @@ export default function DriversPage() {
           setDeletingDriver(null);
         }}
         onConfirm={handleConfirmDeleteDriver}
-        title="Supprimer ce chauffeur ?"
+        title="Supprimer ce livreur ?"
         description={
           deletingDriver
-            ? `Cette action est irréversible. Chauffeur: ${deletingDriver.name}`
+            ? `Cette action est irréversible. Livreur: ${deletingDriver.name}`
             : "Cette action est irréversible."
         }
         confirmText="Supprimer"

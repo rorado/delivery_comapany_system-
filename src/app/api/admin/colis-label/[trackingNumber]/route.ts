@@ -25,15 +25,11 @@ export async function GET(
     const all = await readAdminShipments();
     const shipment = all.find((s) => s.packageNumber === trackingNumber);
 
-    // Generate QR/Barcode even if shipment isn't found (e.g. seeded client list).
-    // In that case, we fall back to values from query params / placeholders.
-
     const bwipjs = (await import("bwip-js")).default;
 
     const qrPng = await bwipjs.toBuffer({
       bcid: "qrcode",
       text: trackingNumber,
-      // Higher scale so the PDF stays crisp even when printed.
       scale: 8,
       includetext: false,
       padding: 0,
@@ -42,7 +38,6 @@ export async function GET(
     const barcodePng = await bwipjs.toBuffer({
       bcid: "code128",
       text: trackingNumber,
-      // Higher resolution + height so it doesn't look blurry in the PDF.
       scale: 4,
       height: 18,
       includetext: false,

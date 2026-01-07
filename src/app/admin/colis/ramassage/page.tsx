@@ -1,1 +1,1 @@
-export { default } from "../../expeditions/page";
+export { default } from "../liste/page";

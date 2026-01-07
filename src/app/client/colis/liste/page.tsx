@@ -16,7 +16,6 @@ import {
 import Link from "next/link";
 
 import type { ClientShipment } from "@/types/clientShipment";
-import { clientShipmentsSeed } from "@/data/clientShipmentsSeed";
 
 export default function MyShipmentsPage() {
   const searchParams = useSearchParams();
@@ -25,8 +24,7 @@ export default function MyShipmentsPage() {
   const lastUrlStatus = useRef<string | null>(null);
   const lastUrlNew = useRef<string | null>(null);
   const isColisRoute = pathname.startsWith("/client/colis");
-  const [shipments, setShipments] =
-    useState<ClientShipment[]>(clientShipmentsSeed);
+  const [shipments, setShipments] = useState<ClientShipment[]>([]);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [pageSize, setPageSize] = useState<number>(10);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(() => new Set());
@@ -36,11 +34,11 @@ export default function MyShipmentsPage() {
     (async () => {
       try {
         const res = await fetch("/api/client/shipments", { method: "GET" });
-        if (!res.ok) return;
+        if (!res.ok) throw new Error("Failed to fetch");
         const data = (await res.json()) as ClientShipment[];
         if (isMounted && Array.isArray(data)) setShipments(data);
       } catch {
-        // keep seed
+        if (isMounted) setShipments([]);
       }
     })();
     return () => {
@@ -135,6 +133,18 @@ export default function MyShipmentsPage() {
     return /dh/i.test(v) ? v : `${v} DH`;
   };
 
+  const fitText = (doc: jsPDF, value: string | undefined, maxWidth: number) => {
+    const text = (value ?? "").trim() || "—";
+    if (maxWidth <= 0) return text;
+    if (doc.getTextWidth(text) <= maxWidth) return text;
+    const ellipsis = "…";
+    let cut = text;
+    while (cut.length > 0 && doc.getTextWidth(cut + ellipsis) > maxWidth) {
+      cut = cut.slice(0, -1);
+    }
+    return cut.length ? cut + ellipsis : ellipsis;
+  };
+
   const getStatusColor = (status: string) => {
     if (status === "Livré") return "success" as const;
     if (status === "En transit" || status === "En livraison")
@@ -215,188 +225,339 @@ export default function MyShipmentsPage() {
         throw new Error("Invalid label payload");
       }
 
-      const doc = new jsPDF({ unit: "pt", format: "a4" });
-      const pageWidth = doc.internal.pageSize.getWidth();
-      const margin = 40;
-      const labelW = 420;
-      const labelH = 420;
-      const x0 = (pageWidth - labelW) / 2;
-      const y0 = margin;
-      const pad = 18;
+      const labelSize = 100;
 
-      // Outer dashed border
-      doc.setDrawColor(170);
-      doc.setLineWidth(1);
+      const doc = new jsPDF({ unit: "mm", format: [labelSize, labelSize] });
+      const x0 = 0;
+      const y0 = 0;
 
-      const anyDoc = doc as unknown as {
-        setLineDashPattern?: (pattern: number[], phase: number) => void;
-        setLineDash?: (pattern: number[], phase: number) => void;
+      const labelW = doc.internal.pageSize.getWidth();
+      const labelH = doc.internal.pageSize.getHeight();
+
+      // --- Label layout (100 x 100 mm) inspired by the sample image ---
+      const BLACK = { r: 0, g: 0, b: 0 };
+      const GRAY = { r: 120, g: 120, b: 120 };
+
+      const hexToRgb = (hex: string) => {
+        const h = hex.trim().replace(/^#/, "");
+        if (h.length === 3) {
+          const r = parseInt(h[0] + h[0], 16);
+          const g = parseInt(h[1] + h[1], 16);
+          const b = parseInt(h[2] + h[2], 16);
+          if ([r, g, b].some((n) => Number.isNaN(n))) return null;
+          return { r, g, b };
+        }
+        if (h.length !== 6) return null;
+        const r = parseInt(h.slice(0, 2), 16);
+        const g = parseInt(h.slice(2, 4), 16);
+        const b = parseInt(h.slice(4, 6), 16);
+        if ([r, g, b].some((n) => Number.isNaN(n))) return null;
+        return { r, g, b };
       };
 
-      if (typeof anyDoc.setLineDashPattern === "function") {
-        anyDoc.setLineDashPattern([6, 4], 0);
-      } else if (typeof anyDoc.setLineDash === "function") {
-        anyDoc.setLineDash([6, 4], 0);
-      }
+      const brandHex =
+        typeof window !== "undefined"
+          ? getComputedStyle(document.documentElement)
+              .getPropertyValue("--color-brand-500")
+              .trim()
+          : "";
+      const BRAND = hexToRgb(brandHex) ?? { r: 70, g: 95, b: 255 };
+      const ACCENT = BRAND;
 
+      const setFillRgb = (c: { r: number; g: number; b: number }) =>
+        doc.setFillColor(c.r, c.g, c.b);
+      const setDrawRgb = (c: { r: number; g: number; b: number }) =>
+        doc.setDrawColor(c.r, c.g, c.b);
+      const setTextRgb = (c: { r: number; g: number; b: number }) =>
+        doc.setTextColor(c.r, c.g, c.b);
+
+      // Outer border (full label)
+      setDrawRgb(BLACK);
+      doc.setLineWidth(0.4);
       doc.rect(x0, y0, labelW, labelH);
 
-      if (typeof anyDoc.setLineDashPattern === "function") {
-        anyDoc.setLineDashPattern([], 0);
-      } else if (typeof anyDoc.setLineDash === "function") {
-        anyDoc.setLineDash([], 0);
-      }
+      const pad = 2;
+      const innerX = x0 + pad;
+      const innerY = y0 + pad;
+      const innerW = labelW - pad * 2;
+      const innerH = labelH - pad * 2;
 
-      // Inner content area
-      const ix = x0 + pad;
-      const iy = y0 + pad;
-      const iw = labelW - pad * 2;
+      // Top header
+      const headerH = 10;
+      doc.setLineWidth(0.3);
+      doc.rect(innerX, innerY, innerW, headerH);
 
-      doc.setDrawColor(0);
-      doc.setLineWidth(2);
-      doc.setTextColor(0);
-
-      // Sender block (top-right)
-      const senderX = ix + 120;
-      const senderY = iy;
-      doc.line(senderX - 10, senderY - 2, senderX - 10, senderY + 62);
-
-      doc.setFontSize(12);
       doc.setFont("helvetica", "bold");
-      doc.text("Expéditeur :", senderX, senderY + 12);
-      doc.text("Tél :", senderX, senderY + 30);
-      doc.text("Date :", senderX, senderY + 48);
+      doc.setFontSize(14);
+      setTextRgb(BLACK);
+      doc.text("OZON", innerX + 26, innerY + 6.8, { align: "right" });
+      setTextRgb(ACCENT);
+      doc.text("EXPRESS", innerX + 27, innerY + 6.8, { align: "left" });
 
       doc.setFont("helvetica", "normal");
-      doc.text(payload.sender || "—", senderX + 78, senderY + 12);
-      doc.text(payload.senderPhone || "—", senderX + 42, senderY + 30);
+      doc.setFontSize(6);
+      setTextRgb(GRAY);
+      doc.text("Service de livraison", innerX + innerW / 2, innerY + 9, {
+        align: "center",
+      });
+
+      // Red band under header
+      const bandH = 6;
+      const bandY = innerY + headerH;
+      setFillRgb(ACCENT);
+      doc.rect(innerX, bandY, innerW, bandH, "F");
+
+      // Left code in band
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(9);
+      setTextRgb({ r: 255, g: 255, b: 255 });
+      const routeCode = shipment.trackingNumber.slice(0, 8) || "0-25-ZNE";
+      doc.text(fitText(doc, routeCode, 28), innerX + 12, bandY + 4.2, {
+        align: "center",
+      });
+
+      // City on right in white box
+      const rightColW = 34;
+      const rightColX = innerX + innerW - rightColW;
+      setFillRgb({ r: 255, g: 255, b: 255 });
+      doc.rect(rightColX, bandY, rightColW, bandH, "F");
+      setDrawRgb(BLACK);
+      doc.rect(rightColX, bandY, rightColW, bandH);
+      setTextRgb(BLACK);
+      doc.setFontSize(9);
       doc.text(
-        `${payload.createdAt} ${payload.createdAtTime || ""}`.trim(),
-        senderX + 42,
-        senderY + 48
+        fitText(
+          doc,
+          (payload.city || "").toUpperCase() || "TETOUAN",
+          rightColW - 4
+        ),
+        rightColX + rightColW / 2,
+        bandY + 4.2,
+        { align: "center" }
       );
 
-      // Thick separator line
-      const sep1Y = iy + 78;
-      doc.setLineWidth(2);
-      doc.line(ix - 4, sep1Y, ix + iw + 4, sep1Y);
+      // Body area
+      const bodyY = bandY + bandH;
+      const bodyH = innerH - headerH - bandH - 18; // leave space for barcode/footer
+      const leftColW = innerW - rightColW - 2;
+      const leftColX = innerX;
+      const leftColY = bodyY;
+      const gap = 2;
 
-      // Recipient section
-      let y = sep1Y + 18;
+      // Left info box
+      doc.setLineWidth(0.3);
+      doc.rect(leftColX, leftColY, leftColW, bodyH);
+
+      // Right column container
+      doc.rect(rightColX, leftColY, rightColW, bodyH);
+
+      // Sender section (top-left)
+      const senderBoxH = 14;
+      doc.rect(leftColX, leftColY, leftColW, senderBoxH);
       doc.setFont("helvetica", "bold");
-      doc.text("Destinataire:", ix - 4, y);
-      doc.setFont("helvetica", "normal");
-      doc.text(payload.recipient || "—", ix + 78, y);
+      doc.setFontSize(6.8);
+      setTextRgb(BLACK);
+      const senderName = payload.sender || shipment.sender || "—";
+      const senderPhone = payload.senderPhone || "—";
+      const dt = `${payload.createdAt || ""} ${
+        payload.createdAtTime || ""
+      }`.trim();
+      doc.text(
+        `Expéditeur: ${fitText(doc, senderName, leftColW - 22)}`,
+        leftColX + 1.5,
+        leftColY + 4.5
+      );
+      doc.text(
+        `Téléphone: ${fitText(doc, senderPhone, leftColW - 24)}`,
+        leftColX + 1.5,
+        leftColY + 8.5
+      );
+      doc.text(
+        `Date: ${fitText(doc, dt || "—", leftColW - 12)}`,
+        leftColX + 1.5,
+        leftColY + 12.5
+      );
 
-      y += 18;
+      // Zone block (red) in the middle
+      const zoneY = leftColY + senderBoxH;
+      const zoneH = 8;
+      const zoneX = leftColX + leftColW - 30;
+      setFillRgb(ACCENT);
+      doc.rect(zoneX, zoneY, 30, zoneH, "F");
+      setTextRgb({ r: 255, g: 255, b: 255 });
       doc.setFont("helvetica", "bold");
-      doc.text("Tél:", ix - 4, y);
-      doc.setFont("helvetica", "normal");
-      doc.text(payload.recipientPhone || "—", ix + 28, y);
+      doc.setFontSize(9);
+      doc.text("NORD", zoneX + 15, zoneY + 5.6, { align: "center" });
+      setTextRgb(BLACK);
+
+      // Recipient details block
+      const recY = zoneY + zoneH + 1;
+      const recH = bodyH - senderBoxH - zoneH - 2;
+      doc.rect(leftColX, recY, leftColW, recH);
+
       doc.setFont("helvetica", "bold");
-      doc.text("Ville:", ix + 160, y);
-      doc.setFont("helvetica", "normal");
-      doc.text(payload.city || "—", ix + 200, y);
+      doc.setFontSize(6.8);
+      const recName = payload.recipient || shipment.recipient || "—";
+      const recPhone = payload.recipientPhone || shipment.recipientPhone || "—";
+      const city = payload.city || shipment.city || shipment.origin || "—";
+      const addr =
+        payload.address || shipment.destination || shipment.origin || "—";
+      const comment = (payload.comment || shipment.comment || "").trim();
+      const product = (payload.product || "").trim();
 
-      y += 18;
+      let ty = recY + 4.5;
+      doc.text(
+        `Destinataire: ${fitText(doc, recName, leftColW - 28)}`,
+        leftColX + 1.5,
+        ty
+      );
+      ty += 4;
+      doc.text(
+        `Téléphone: ${fitText(doc, recPhone, leftColW - 26)}`,
+        leftColX + 1.5,
+        ty
+      );
+      ty += 4;
+      doc.text(
+        `Ville: ${fitText(doc, city, leftColW - 12)}`,
+        leftColX + 1.5,
+        ty
+      );
+      ty += 4;
+      setTextRgb(BLACK);
+      doc.text("Adresse:", leftColX + 1.5, ty);
+      doc.setFont("helvetica", "normal");
+      const addrLines = doc.splitTextToSize(addr, leftColW - 12).slice(0, 2);
+      doc.text(addrLines, leftColX + 13, ty);
+      setTextRgb(BLACK);
+      ty += 4 * addrLines.length;
       doc.setFont("helvetica", "bold");
-      doc.text("Adresse:", ix - 4, y);
-      doc.setFont("helvetica", "normal");
-      const addr = payload.address || "—";
-      const addrLines = doc.splitTextToSize(addr, iw);
-      doc.text(addrLines, ix + 52, y);
-      y += 18 + Math.max(0, (addrLines.length - 1) * 14);
+      // setTextRgb(BLACK);
+      // doc.text("Commentaire:", leftColX + 1.5, ty);
+      // doc.setFont("helvetica", "normal");
+      // const comLines = doc
+      //   .splitTextToSize(comment || "—", leftColW - 10)
+      //   .slice(0, 2);
+      // doc.text(comLines, leftColX + 23, ty);
+      // setTextRgb(BLACK);
+      // ty += 4 * comLines.length;
+      // doc.setFont("helvetica", "bold");
+      // doc.text(
+      //   `Nature Du Produit: ${fitText(doc, product || "—", leftColW - 34)}`,
+      //   leftColX + 1.5,
+      //   Math.min(recY + recH - 2, ty + 2)
+      // );
 
-      // Separator
-      const sep2Y = y + 10;
-      doc.setLineWidth(2);
-      doc.line(ix - 4, sep2Y, ix + iw + 4, sep2Y);
-
-      // QR + Barcode
-      const blockY = sep2Y + 16;
-      const qrSize = 92;
-      const qrX = ix;
-      const qrY = blockY;
-      doc.setLineWidth(2);
-      doc.rect(qrX, qrY, qrSize, qrSize);
+      // Right column: QR top
+      const qrBoxH = 28;
+      doc.rect(rightColX, leftColY, rightColW, qrBoxH);
+      const qrSize = 20;
+      const qrImgX = rightColX + (rightColW - qrSize) / 2;
+      const qrImgY = leftColY + 4;
       if (payload.qrDataUrl) {
         try {
           doc.addImage(
             payload.qrDataUrl,
             "PNG",
-            qrX + 6,
-            qrY + 6,
-            qrSize - 12,
-            qrSize - 12
+            qrImgX,
+            qrImgY,
+            qrSize,
+            qrSize
           );
         } catch {
-          // Keep layout even if image decoding fails.
+          // ignore
         }
       }
 
-      const barcodeX = qrX + qrSize + 14;
-      const barcodeW = ix + iw - barcodeX;
-      doc.rect(barcodeX, qrY, barcodeW, qrSize);
-
+      // Delivery mode block (red)
+      const modeY = leftColY + qrBoxH;
+      const modeH = 8;
+      setFillRgb(ACCENT);
+      doc.rect(rightColX, modeY, rightColW, modeH, "F");
       doc.setFont("helvetica", "bold");
-      doc.setFontSize(11);
-      doc.text("#NUMÉRO DE COLIS", barcodeX + barcodeW / 2, qrY + 16, {
+      doc.setFontSize(7.5);
+      setTextRgb({ r: 255, g: 255, b: 255 });
+      doc.text("À domicile", rightColX + rightColW / 2, modeY + 5.4, {
         align: "center",
       });
 
+      // Price + payment box
+      setTextRgb(BLACK);
+      const payY = modeY + modeH;
+      const payH = 18;
+      doc.rect(rightColX, payY, rightColW, payH);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(6.5);
+      doc.text("CRBT: C/Espèce", rightColX + rightColW / 2, payY + 6, {
+        align: "center",
+      });
+      doc.setFontSize(8);
+      doc.text(
+        fitText(doc, formatPriceDh(payload.price), rightColW - 4),
+        rightColX + rightColW / 2,
+        payY + 12,
+        { align: "center" }
+      );
+
+      // Thank you message
+      const thanksY = payY + payH;
+      const thanksH = bodyH - qrBoxH - modeH - payH;
+      doc.rect(rightColX, thanksY, rightColW, thanksH);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(5.8);
+      setTextRgb(GRAY);
+      doc.text(
+        "Merci pour votre confiance.",
+        rightColX + rightColW / 2,
+        thanksY + Math.min(thanksH - 2, 7),
+        { align: "center" }
+      );
+
+      // Bottom barcode area
+      const bottomY = innerY + innerH - 16;
+      const bottomH = 10;
+      doc.rect(innerX, bottomY, innerW, bottomH);
+      const bcImgW = innerW - 30;
+      const bcImgH = 6;
+      const bcImgX = innerX + 4;
+      const bcImgY = bottomY + 1.5;
       if (payload.barcodeDataUrl) {
         try {
           doc.addImage(
             payload.barcodeDataUrl,
             "PNG",
-            barcodeX + 8,
-            qrY + 22,
-            barcodeW - 16,
-            46
+            bcImgX,
+            bcImgY,
+            bcImgW,
+            bcImgH
           );
         } catch {
-          // Keep layout even if image decoding fails.
+          // ignore
         }
       }
-
-      doc.setFontSize(12);
-      doc.text(payload.trackingNumber, barcodeX + barcodeW / 2, qrY + 86, {
-        align: "center",
-      });
-
-      // Separator
-      const sep3Y = qrY + qrSize + 14;
-      doc.setLineWidth(2);
-      doc.line(ix - 4, sep3Y, ix + iw + 4, sep3Y);
-
-      // Product + Commentaire + Price
-      y = sep3Y + 18;
       doc.setFont("helvetica", "bold");
-      doc.text("Produit:", ix - 4, y);
-      doc.setFont("helvetica", "normal");
-      doc.text(payload.product || "1 x (1)", ix + 52, y);
-
-      y += 28;
-      doc.setFont("helvetica", "bold");
-      doc.text("Commentaire:", ix - 4, y);
-
-      const priceBoxW = 120;
-      const priceBoxH = 44;
-      const priceX = ix + iw - priceBoxW;
-      const priceY = y + 6;
-      doc.setLineWidth(3);
-      doc.rect(priceX, priceY, priceBoxW, priceBoxH);
-      doc.setLineWidth(1.5);
-      doc.rect(priceX + 6, priceY + 6, priceBoxW - 12, priceBoxH - 12);
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(16);
+      doc.setFontSize(8);
+      setTextRgb(BLACK);
       doc.text(
-        `${payload.price} DH`.trim(),
-        priceX + priceBoxW / 2,
-        priceY + 28,
-        {
-          align: "center",
-        }
+        fitText(doc, payload.trackingNumber, 26),
+        innerX + innerW - 2,
+        bottomY + 7.5,
+        { align: "right" }
+      );
+
+      // Footer red bar
+      const footerY = innerY + innerH - 6;
+      const footerH = 6;
+      setFillRgb(ACCENT);
+      doc.rect(innerX, footerY, innerW, footerH, "F");
+      setTextRgb({ r: 255, g: 255, b: 255 });
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(7);
+      doc.text(
+        "Merci d'avoir choisi notre service.",
+        innerX + innerW / 2,
+        footerY + 4.2,
+        { align: "center" }
       );
 
       const pdfBlob = doc.output("blob");

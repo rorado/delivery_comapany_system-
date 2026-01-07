@@ -20,7 +20,6 @@ import { DropdownItem } from "@/components/ui/dropdown/DropdownItem";
 import jsPDF from "jspdf";
 
 import type { Shipment } from "@/types/expedition";
-import { adminExpeditionsSeed } from "@/data/adminExpeditionsSeed";
 
 export default function ShipmentsPage() {
   const searchParams = useSearchParams();
@@ -29,7 +28,7 @@ export default function ShipmentsPage() {
   const lastUrlStatus = useRef<string | null>(null);
   const lastUrlNew = useRef<string | null>(null);
   const isColisRoute = pathname.startsWith("/admin/colis");
-  const [shipments, setShipments] = useState<Shipment[]>(adminExpeditionsSeed);
+  const [shipments, setShipments] = useState<Shipment[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -80,11 +79,11 @@ export default function ShipmentsPage() {
     (async () => {
       try {
         const res = await fetch("/api/admin/expeditions", { method: "GET" });
-        if (!res.ok) return;
+        if (!res.ok) throw new Error("Failed to fetch");
         const data = (await res.json()) as Shipment[];
         if (isMounted && Array.isArray(data)) setShipments(data);
       } catch {
-        // keep seed
+        if (isMounted) setShipments([]);
       }
     })();
     return () => {
@@ -1076,10 +1075,10 @@ export default function ShipmentsPage() {
                 </h5>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <Label>Chauffeur</Label>
+                    <Label>Livreur</Label>
                     <input
                       type="text"
-                      placeholder="Entrez le nom du chauffeur"
+                      placeholder="Entrez le nom du livreur"
                       value={formData.driver}
                       onChange={(e) =>
                         setFormData({ ...formData, driver: e.target.value })
