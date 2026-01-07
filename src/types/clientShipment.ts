@@ -10,10 +10,15 @@ export interface ClientShipment {
   trackingNumber: string;
   sender: string;
   recipient: string;
+  recipientPhone?: string;
   origin: string;
   destination: string;
+  city?: string;
   weight: string;
   status: ClientShipmentStatus;
   estimatedDelivery: string;
   createdAt: string;
+  createdAtTime?: string;
+  price?: string;
+  comment?: string;
 }

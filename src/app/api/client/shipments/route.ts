@@ -22,12 +22,17 @@ const shipmentSchema = z.object({
   trackingNumber: z.string(),
   sender: z.string(),
   recipient: z.string(),
+  recipientPhone: z.string().optional(),
   origin: z.string(),
   destination: z.string(),
+  city: z.string().optional(),
   weight: z.string(),
   status: clientStatusSchema,
   estimatedDelivery: z.string(),
   createdAt: z.string(),
+  createdAtTime: z.string().optional(),
+  price: z.string().optional(),
+  comment: z.string().optional(),
 });
 
 const shipmentsSchema = z.array(shipmentSchema);
@@ -75,12 +80,17 @@ export async function GET() {
       trackingNumber: s.packageNumber,
       sender: s.sender,
       recipient: s.recipient,
+      recipientPhone: s.recipientPhone,
       origin: s.origin,
       destination: s.destination,
+      city: s.city,
       weight: s.weight,
       status: toClientStatus(s.status),
       estimatedDelivery: s.estimatedDelivery,
       createdAt: s.createdAt,
+      createdAtTime: s.createdAtTime,
+      price: s.price,
+      comment: s.comment,
     }));
 
     const shipments = shipmentsSchema.parse(mapped);
@@ -113,12 +123,17 @@ export async function PUT(req: Request) {
           packageNumber: c.trackingNumber || existing.packageNumber,
           sender: c.sender,
           recipient: c.recipient,
+          recipientPhone: c.recipientPhone ?? existing.recipientPhone,
           origin: c.origin,
           destination: c.destination,
+          city: c.city ?? existing.city,
           weight: c.weight,
+          price: c.price ?? existing.price,
+          comment: c.comment ?? existing.comment,
           status: toAdminStatus(c.status),
           estimatedDelivery: c.estimatedDelivery,
           createdAt: c.createdAt,
+          createdAtTime: c.createdAtTime ?? existing.createdAtTime,
         });
         continue;
       }
@@ -137,20 +152,20 @@ export async function PUT(req: Request) {
         sender: c.sender,
         senderPhone: "",
         recipient: c.recipient,
-        recipientPhone: "",
+        recipientPhone: c.recipientPhone ?? "",
         origin: c.origin,
         destination: c.destination,
-        city: "",
+        city: c.city ?? "",
         address: "",
         weight: c.weight,
         product: "",
-        comment: "",
-        price: "",
+        comment: c.comment ?? "",
+        price: c.price ?? "",
         status: toAdminStatus(c.status),
         driver: "",
         estimatedDelivery: c.estimatedDelivery,
         createdAt: c.createdAt,
-        createdAtTime,
+        createdAtTime: c.createdAtTime ?? createdAtTime,
       });
     }
 
@@ -162,12 +177,17 @@ export async function PUT(req: Request) {
       trackingNumber: s.packageNumber,
       sender: s.sender,
       recipient: s.recipient,
+      recipientPhone: s.recipientPhone,
       origin: s.origin,
       destination: s.destination,
+      city: s.city,
       weight: s.weight,
       status: toClientStatus(s.status),
       estimatedDelivery: s.estimatedDelivery,
       createdAt: s.createdAt,
+      createdAtTime: s.createdAtTime,
+      price: s.price,
+      comment: s.comment,
     }));
 
     return NextResponse.json(shipmentsSchema.parse(responseShipments));

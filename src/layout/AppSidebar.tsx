@@ -44,7 +44,7 @@ const navItems: NavItem[] = [
         name: "Ajouter un nouveau colis",
         path: "/admin/colis/nouveau",
         pro: false,
-        new: true,
+        // new: true,
       },
       {
         name: "Colis pour ramassage",
