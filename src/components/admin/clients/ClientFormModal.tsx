@@ -12,6 +12,8 @@ export interface ClientFormData {
   address: string;
   image: string;
   password: string;
+  isActive: boolean;
+  isBlocked: boolean;
 }
 
 interface ClientFormModalProps {
@@ -33,7 +35,17 @@ export default function ClientFormModal({
 }: ClientFormModalProps) {
   const handleChange = useCallback(
     (key: keyof ClientFormData, value: string) => {
-      setFormData({ ...formData, [key]: value });
+      setFormData({ ...formData, [key]: value } as ClientFormData);
+    },
+    [formData, setFormData]
+  );
+
+  const handleToggle = useCallback(
+    (key: keyof ClientFormData) => {
+      setFormData({
+        ...formData,
+        [key]: !(formData as any)[key],
+      } as ClientFormData);
     },
     [formData, setFormData]
   );
@@ -125,6 +137,30 @@ export default function ClientFormModal({
           <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
             Si vide, un avatar par défaut sera affiché.
           </p>
+        </div>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <label className="inline-flex items-center gap-3 rounded-lg border border-gray-200 p-3 dark:border-gray-800">
+            <input
+              type="checkbox"
+              checked={formData.isActive}
+              onChange={() => handleToggle("isActive")}
+              className="h-5 w-5 rounded border-gray-300 text-brand-500 focus:ring-brand-500/20 dark:border-gray-700 dark:bg-gray-900"
+            />
+            <span className="text-sm text-gray-700 dark:text-gray-300">
+              Activer le client
+            </span>
+          </label>
+          <label className="inline-flex items-center gap-3 rounded-lg border border-gray-200 p-3 dark:border-gray-800">
+            <input
+              type="checkbox"
+              checked={formData.isBlocked}
+              onChange={() => handleToggle("isBlocked")}
+              className="h-5 w-5 rounded border-gray-300 text-red-500 focus:ring-red-500/20 dark:border-gray-700 dark:bg-gray-900"
+            />
+            <span className="text-sm text-gray-700 dark:text-gray-300">
+              Bloquer le client
+            </span>
+          </label>
         </div>
         <div className="flex items-center justify-end gap-3 pt-4">
           <Button type="button" size="sm" variant="outline" onClick={onClose}>

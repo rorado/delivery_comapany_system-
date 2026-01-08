@@ -26,7 +26,7 @@ export default function ClientsStats({ customers }: ClientsStatsProps) {
       <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/3">
         <p className="text-sm text-gray-500 dark:text-gray-400">Revenu Total</p>
         <p className="mt-2 text-2xl font-bold text-gray-800 dark:text-white/90">
-          ${totalRevenueK}K
+          {totalRevenueK}DH
         </p>
       </div>
     </div>

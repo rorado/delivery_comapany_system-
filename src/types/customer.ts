@@ -9,4 +9,6 @@ export interface Customer {
   lastOrder: string;
   image?: string;
   password?: string;
+  isActive?: boolean;
+  isBlocked?: boolean;
 }

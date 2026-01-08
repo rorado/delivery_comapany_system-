@@ -26,6 +26,8 @@ const customerSchema = z.object({
   lastOrder: z.string(),
   image: z.string().optional(),
   password: z.string().optional(),
+  isActive: z.boolean().optional(),
+  isBlocked: z.boolean().optional(),
 });
 
 const customersSchema = z.array(customerSchema);
@@ -48,6 +50,8 @@ export async function GET() {
     const normalized = customers.map((c) => ({
       ...c,
       image: normalizeImage(c.image),
+      isActive: c.isActive ?? true,
+      isBlocked: c.isBlocked ?? false,
     }));
     return NextResponse.json(normalized);
   } catch (error) {
@@ -65,6 +69,8 @@ export async function PUT(req: Request) {
     const normalized = customers.map((c) => ({
       ...c,
       image: normalizeImage(c.image),
+      isActive: c.isActive ?? true,
+      isBlocked: c.isBlocked ?? false,
     }));
     await writeJsonFile(DB_PATH, normalized);
     return NextResponse.json(normalized);

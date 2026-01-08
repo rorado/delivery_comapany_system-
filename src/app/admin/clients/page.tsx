@@ -5,7 +5,9 @@ import { useModal } from "@/hooks/useModal";
 import Button from "@/components/ui/button/Button";
 import ConfirmDeleteModal from "@/components/common/ConfirmDeleteModal";
 import ClientsTable from "@/components/admin/clients/ClientsTable";
-import ClientFormModal from "@/components/admin/clients/ClientFormModal";
+import ClientFormModal, {
+  ClientFormData,
+} from "@/components/admin/clients/ClientFormModal";
 import ClientsStats from "@/components/admin/clients/ClientsStats";
 
 import type { Customer } from "@/types/customer";
@@ -26,13 +28,15 @@ export default function CustomersPage() {
   const [deletingCustomer, setDeletingCustomer] = useState<Customer | null>(
     null
   );
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<ClientFormData>({
     name: "",
     email: "",
     phone: "",
     address: "",
     image: "",
     password: "",
+    isActive: true,
+    isBlocked: false,
   });
 
   const saveCustomersToDb = async (nextCustomers: Customer[]) => {
@@ -87,6 +91,8 @@ export default function CustomersPage() {
       address: "",
       image: "",
       password: "",
+      isActive: true,
+      isBlocked: false,
     });
     openModal();
   };
@@ -100,6 +106,8 @@ export default function CustomersPage() {
       address: customer.address,
       image: customer.image ?? "",
       password: customer.password ?? "",
+      isActive: customer.isActive ?? true,
+      isBlocked: customer.isBlocked ?? false,
     });
     openModal();
   };

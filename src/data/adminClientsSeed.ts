@@ -11,6 +11,8 @@ export const adminClientsSeed: Customer[] = [
     totalSpent: "1200 MAD",
     lastOrder: "2026-01-01",
     image: "/images/user/user-01.jpg",
+    isActive: true,
+    isBlocked: false,
   },
   {
     id: 2,
@@ -22,6 +24,8 @@ export const adminClientsSeed: Customer[] = [
     totalSpent: "4800 MAD",
     lastOrder: "2026-01-02",
     image: "/images/user/user-02.jpg",
+    isActive: true,
+    isBlocked: false,
   },
   {
     id: 3,
@@ -33,6 +37,8 @@ export const adminClientsSeed: Customer[] = [
     totalSpent: "400 MAD",
     lastOrder: "2025-12-15",
     image: "/images/user/user-03.jpg",
+    isActive: true,
+    isBlocked: false,
   },
   {
     id: 4,
@@ -44,6 +50,8 @@ export const adminClientsSeed: Customer[] = [
     totalSpent: "2200 MAD",
     lastOrder: "2026-01-03",
     image: "/images/user/user-04.jpg",
+    isActive: true,
+    isBlocked: false,
   },
   {
     id: 5,
@@ -55,5 +63,7 @@ export const adminClientsSeed: Customer[] = [
     totalSpent: "5600 MAD",
     lastOrder: "2026-01-02",
     image: "/images/user/user-05.jpg",
+    isActive: true,
+    isBlocked: false,
   },
 ];

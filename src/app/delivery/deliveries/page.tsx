@@ -205,9 +205,9 @@ export default function MyDeliveriesPage() {
       doc.setFont("helvetica", "bold");
       doc.setFontSize(14);
       setTextRgb(BLACK);
-      doc.text("OZON", innerX + 26, innerY + 6.8, { align: "right" });
+      doc.text("FAST", innerX + 26, innerY + 6.8, { align: "right" });
       setTextRgb(ACCENT);
-      doc.text("EXPRESS", innerX + 27, innerY + 6.8, { align: "left" });
+      doc.text("DELIVER", innerX + 27, innerY + 6.8, { align: "left" });
 
       doc.setFont("helvetica", "normal");
       doc.setFontSize(6);

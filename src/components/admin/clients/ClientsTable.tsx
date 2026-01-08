@@ -137,9 +137,9 @@ export default function ClientsTable({
                       <button className="p-2 text-gray-500 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-gray-400">
                         <EyeIcon className="w-4 h-4" />
                       </button>
-                      <button className="p-2 text-gray-500 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-gray-400">
+                      {/* <button className="p-2 text-gray-500 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-gray-400">
                         <MailIcon className="w-4 h-4" />
-                      </button>
+                      </button> */}
                       <button
                         onClick={() => onEdit(customer)}
                         className="p-2 text-gray-500 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-gray-400"
