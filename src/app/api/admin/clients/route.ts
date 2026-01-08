@@ -25,6 +25,7 @@ const customerSchema = z.object({
   totalSpent: z.string(),
   lastOrder: z.string(),
   image: z.string().optional(),
+  password: z.string().optional(),
 });
 
 const customersSchema = z.array(customerSchema);

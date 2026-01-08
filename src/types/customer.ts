@@ -8,4 +8,5 @@ export interface Customer {
   totalSpent: string;
   lastOrder: string;
   image?: string;
+  password?: string;
 }

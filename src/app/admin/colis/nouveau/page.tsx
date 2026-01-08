@@ -2,11 +2,16 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import Button from "@/components/ui/button/Button";
 import Label from "@/components/form/Label";
+import HeaderOptions, {
+  FragileValue,
+} from "@/components/admin/colis/HeaderOptions";
+import TrackingRecipientPhone from "@/components/admin/colis/TrackingRecipientPhone";
+import CityAddressComment from "@/components/admin/colis/CityAddressComment";
+import ProductWeightPrice from "@/components/admin/colis/ProductWeightPrice";
+import DeliveryFeesSummary from "@/components/admin/colis/DeliveryFeesSummary";
+import FormActions from "@/components/admin/colis/FormActions";
 import type { Shipment } from "@/types/expedition";
-
-type FragileValue = "Oui" | "Non";
 
 type DeliveryFees = {
   pickup: number;
@@ -221,7 +226,7 @@ export default function AdminNouveauColisPage() {
       const newShipment: Shipment = {
         id: newId,
         packageNumber,
-        sender: "Client",
+        sender: "Admin",
         senderPhone: "",
         recipient: recipient.trim(),
         recipientPhone: phone.trim(),
@@ -255,178 +260,57 @@ export default function AdminNouveauColisPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <h1 className="text-2xl font-bold text-gray-800 dark:text-white/90">
-          Nouveau Colis
-        </h1>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:items-end">
-          <div>
-            <Label htmlFor="colisAction">Colis</Label>
-            <select
-              id="colisAction"
-              value={colisAction}
-              onChange={(e) => setColisAction(e.target.value)}
-              className="mt-1 h-11 w-full rounded-full border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-theme-xs focus:outline-none focus:ring-2 focus:ring-brand-500/10 focus:border-brand-300 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700"
-            >
-              <option value="Ouvrir le colis">Ouvrir le colis</option>
-            </select>
-          </div>
-          <div>
-            <Label htmlFor="fragile">Fragile</Label>
-            <select
-              id="fragile"
-              value={fragile}
-              onChange={(e) => setFragile(e.target.value as FragileValue)}
-              className="mt-1 h-11 w-full rounded-full border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-theme-xs focus:outline-none focus:ring-2 focus:ring-brand-500/10 focus:border-brand-300 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700"
-            >
-              <option value="Non">Non</option>
-              <option value="Oui">Oui</option>
-            </select>
-          </div>
-          <div className="pt-6 sm:pt-0">
-            <label className="inline-flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300">
-              <input
-                type="checkbox"
-                checked={exchange}
-                onChange={(e) => setExchange(e.target.checked)}
-                className="mt-1"
-              />
-              <span>
-                Échange
-                <span className="block text-theme-xs text-gray-500 dark:text-gray-400 mt-1">
-                  ( Le colis sera remplacer avec l'ancien a la livraison. )
-                </span>
-              </span>
-            </label>
-          </div>
-        </div>
-      </div>
+      <HeaderOptions
+        colisAction={colisAction}
+        fragile={fragile}
+        exchange={exchange}
+        onChangeColisAction={setColisAction}
+        onChangeFragile={(v) => setFragile(v)}
+        onChangeExchange={(v) => setExchange(v)}
+      />
 
       <div className="rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-white/3">
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-          <div className="lg:col-span-1">
-            <Label htmlFor="trackingCode">Code suivi *</Label>
-            <input
-              id="trackingCode"
-              value={trackingCode}
-              onChange={(e) => setTrackingCode(e.target.value)}
-              placeholder="Code suivi *"
-              className="mt-1 h-11 w-full rounded-md border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-theme-xs focus:outline-none focus:ring-2 focus:ring-brand-500/10 focus:border-brand-300 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700"
-            />
-          </div>
-          <div className="lg:col-span-1">
-            <Label htmlFor="recipient">Destinataire *</Label>
-            <input
-              id="recipient"
-              value={recipient}
-              onChange={(e) => setRecipient(e.target.value)}
-              placeholder="Destinataire *"
-              className="mt-1 h-11 w-full rounded-md border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-theme-xs focus:outline-none focus:ring-2 focus:ring-brand-500/10 focus:border-brand-300 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700"
-            />
-          </div>
-          <div className="lg:col-span-1">
-            <Label htmlFor="phone">Téléphone *</Label>
-            <input
-              id="phone"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="Téléphone *"
-              className="mt-1 h-11 w-full rounded-md border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-theme-xs focus:outline-none focus:ring-2 focus:ring-brand-500/10 focus:border-brand-300 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700"
-            />
-          </div>
-          <div className="lg:col-span-1">
-            <Label htmlFor="city">Ville *</Label>
-            <select
-              id="city"
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
-              className="mt-1 h-11 w-full rounded-md border border-gray-300 bg-gray-100 px-4 py-2.5 text-sm shadow-theme-xs focus:outline-none focus:ring-2 focus:ring-brand-500/10 focus:border-brand-300 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700"
-            >
-              <option value="">Ville *</option>
-              {MOROCCO_CITIES.map((c) => (
-                <option key={c} value={c}>
-                  {c} ({CITY_DELIVERY_FEES[c]?.pickup.toFixed(2)})
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="lg:col-span-1">
-            <Label htmlFor="address">Adresse *</Label>
-            <textarea
-              id="address"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              placeholder="Adresse *"
-              className="mt-1 min-h-11 h-11 w-full rounded-md border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-theme-xs focus:outline-none focus:ring-2 focus:ring-brand-500/10 focus:border-brand-300 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700"
-            />
-          </div>
-          <div className="lg:col-span-3">
-            <Label htmlFor="comment">
-              Commentaire ( Autre téléphone, Date de livraison ... )
-            </Label>
-            <textarea
-              id="comment"
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              placeholder="Commentaire ( Autre téléphone, Date de livraison ... )"
-              className="mt-1 min-h-11 w-full rounded-md border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-theme-xs focus:outline-none focus:ring-2 focus:ring-brand-500/10 focus:border-brand-300 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700"
-            />
-          </div>
-          <div className="lg:col-span-3">
-            <Label htmlFor="productNature">Nature Du Produit</Label>
-            <input
-              id="productNature"
-              value={productNature}
-              onChange={(e) => setProductNature(e.target.value)}
-              placeholder="Nature Du Produit"
-              className="mt-1 h-11 w-full rounded-md border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-theme-xs focus:outline-none focus:ring-2 focus:ring-brand-500/10 focus:border-brand-300 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700"
-            />
-          </div>
-          <div className="lg:col-span-3">
-            <Label htmlFor="weight">Poids</Label>
-            <input
-              id="weight"
-              value={weight}
-              onChange={(e) => setWeight(e.target.value)}
-              placeholder="Poids (ex: 2,5 kg)"
-              className="mt-1 h-11 w-full rounded-md border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-theme-xs focus:outline-none focus:ring-2 focus:ring-brand-500/10 focus:border-brand-300 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700"
-            />
-          </div>
-          <div className="lg:col-span-3">
-            <Label htmlFor="price">Prix *</Label>
-            <input
-              id="price"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              placeholder="Prix *"
-              className="mt-1 h-11 w-full rounded-md border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-theme-xs focus:outline-none focus:ring-2 focus:ring-brand-500/10 focus:border-brand-300 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700"
-            />
-          </div>
+          <TrackingRecipientPhone
+            trackingCode={trackingCode}
+            recipient={recipient}
+            phone={phone}
+            onChangeTracking={setTrackingCode}
+            onChangeRecipient={setRecipient}
+            onChangePhone={setPhone}
+          />
+          <CityAddressComment
+            city={city}
+            address={address}
+            comment={comment}
+            cities={MOROCCO_CITIES}
+            cityFees={CITY_DELIVERY_FEES}
+            onChangeCity={setCity}
+            onChangeAddress={setAddress}
+            onChangeComment={setComment}
+          />
+          <ProductWeightPrice
+            productNature={productNature}
+            weight={weight}
+            price={price}
+            onChangeProductNature={setProductNature}
+            onChangeWeight={setWeight}
+            onChangePrice={setPrice}
+          />
         </div>
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="text-sm text-gray-700 dark:text-gray-300">
-          <div>
-            Frais de livraison ( Ramassage ) : {deliveryFees.pickup.toFixed(2)}
-          </div>
-          <div>
-            Frais de livraison ( Ramassage Hors ) :{" "}
-            {deliveryFees.pickupOut.toFixed(2)}
-          </div>
-        </div>
-        <div className="flex gap-2">
-          <Button size="sm" variant="outline" onClick={() => router.back()}>
-            Retour
-          </Button>
-          <Button
-            size="sm"
-            onClick={handleSubmit}
-            disabled={!canSubmit || isSaving}
-          >
-            {isSaving ? "Enregistrement..." : "Enregistrer"}
-          </Button>
-        </div>
+        <DeliveryFeesSummary
+          pickupFee={deliveryFees.pickup}
+          pickupOutFee={deliveryFees.pickupOut}
+        />
+        <FormActions
+          onCancel={() => router.back()}
+          onSubmit={handleSubmit}
+          disabled={!canSubmit || isSaving}
+          isSaving={isSaving}
+        />
       </div>
     </div>
   );

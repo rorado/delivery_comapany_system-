@@ -10,4 +10,5 @@ export interface Driver {
   deliveries: number;
   rating: number;
   image?: string;
+  password?: string;
 }

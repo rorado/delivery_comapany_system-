@@ -1,25 +1,98 @@
 "use client";
-import { useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Button from "@/components/ui/button/Button";
 import Label from "@/components/form/Label";
 import { PencilIcon } from "@/icons";
 
+type DeliveryProfile = {
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  vehicle: string;
+  licenseNumber: string;
+};
+
 export default function DeliveryProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
-  const [profileData, setProfileData] = useState({
-    name: "Omar El Fassi",
-    email: "omar.elfassi@example.ma",
-    phone: "+212 6 45 67 89 10",
-    vehicle: "Camion #DLV-001",
-    licenseNumber: "MA-123456",
-    address: "Boulevard Zerktouni, Casablanca 20000",
-  });
+  const defaultProfile = useMemo<DeliveryProfile>(
+    () => ({
+      name: "Omar El Fassi",
+      email: "delivery@fastdeliver.com",
+      phone: "+212 6 45 67 89 10",
+      address: "Boulevard Zerktouni, Casablanca 20000",
+      vehicle: "Camion #DLV-001",
+      licenseNumber: "MA-123456",
+    }),
+    []
+  );
 
-  const handleSave = () => {
+  const [profileData, setProfileData] =
+    useState<DeliveryProfile>(defaultProfile);
+  const [savedProfile, setSavedProfile] =
+    useState<DeliveryProfile>(defaultProfile);
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const res = await fetch("/api/delivery/profile", {
+          method: "GET",
+          headers: { Accept: "application/json" },
+        });
+        if (!res.ok) return;
+        const data = (await res.json()) as DeliveryProfile;
+        if (!mounted) return;
+        if (data && typeof data === "object") {
+          setProfileData(data);
+          setSavedProfile(data);
+        }
+      } catch {
+        // keep defaults
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, [defaultProfile]);
+
+  const handleSave = useCallback(async () => {
+    setIsSaving(true);
+    try {
+      const res = await fetch("/api/delivery/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(profileData),
+      });
+
+      if (!res.ok) {
+        let details = "";
+        try {
+          details = await res.text();
+        } catch {
+          // ignore
+        }
+        throw new Error(details || `HTTP ${res.status}`);
+      }
+
+      const saved = (await res.json()) as DeliveryProfile;
+      setSavedProfile(saved);
+      setProfileData(saved);
+      setIsEditing(false);
+    } catch (e) {
+      const message = e instanceof Error ? e.message : String(e);
+      window.alert(`Erreur: impossible d'enregistrer le profil (${message})`);
+    } finally {
+      setIsSaving(false);
+    }
+  }, [profileData]);
+
+  const handleCancel = useCallback(() => {
+    setProfileData(savedProfile);
     setIsEditing(false);
-    // In production, save to backend
-  };
+  }, [savedProfile]);
 
   return (
     <div className="space-y-6">
@@ -76,14 +149,7 @@ export default function DeliveryProfilePage() {
                       98%
                     </span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-500 dark:text-gray-400">
-                      Rating
-                    </span>
-                    <span className="font-medium text-gray-800 dark:text-white/90">
-                      4.8 ⭐
-                    </span>
-                  </div>
+                  <div className="flex justify-between"></div>
                 </div>
               </div>
             </div>
@@ -99,7 +165,7 @@ export default function DeliveryProfilePage() {
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                handleSave();
+                void handleSave();
               }}
               className="space-y-5"
             >
@@ -224,14 +290,15 @@ export default function DeliveryProfilePage() {
               </div>
               {isEditing && (
                 <div className="flex items-center gap-3 pt-4">
-                  <Button type="submit" size="sm">
+                  <Button type="submit" size="sm" disabled={isSaving}>
                     Enregistrer
                   </Button>
                   <Button
                     type="button"
                     size="sm"
                     variant="outline"
-                    onClick={() => setIsEditing(false)}
+                    onClick={handleCancel}
+                    disabled={isSaving}
                   >
                     Annuler
                   </Button>

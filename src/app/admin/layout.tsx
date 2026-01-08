@@ -16,8 +16,8 @@ export default function AdminLayout({
   // Dynamic class for main content margin based on sidebar state
   const mainContentMargin = isMobileOpen
     ? "ml-0"
-    : isExpanded || isHovered
-    ? "lg:ml-[290px]"
+    : isExpanded
+    ? "lg:ml-[250px]"
     : "lg:ml-[90px]";
 
   return (
@@ -32,7 +32,9 @@ export default function AdminLayout({
         {/* Header */}
         <AppHeader />
         {/* Page Content */}
-        <div className="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6">{children}</div>
+        <div className="p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6">
+          {children}
+        </div>
       </div>
     </div>
   );

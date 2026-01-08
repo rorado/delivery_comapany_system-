@@ -1,19 +1,12 @@
 "use client";
 import { useEffect, useState } from "react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import Image from "next/image";
-import { PlusIcon, EyeIcon, PencilIcon, MailIcon, TrashBinIcon } from "@/icons";
-import { Modal } from "@/components/ui/modal";
+import { PlusIcon } from "@/icons";
 import { useModal } from "@/hooks/useModal";
 import Button from "@/components/ui/button/Button";
-import Label from "@/components/form/Label";
 import ConfirmDeleteModal from "@/components/common/ConfirmDeleteModal";
+import ClientsTable from "@/components/admin/clients/ClientsTable";
+import ClientFormModal from "@/components/admin/clients/ClientFormModal";
+import ClientsStats from "@/components/admin/clients/ClientsStats";
 
 import type { Customer } from "@/types/customer";
 import { adminClientsSeed } from "@/data/adminClientsSeed";
@@ -39,6 +32,7 @@ export default function CustomersPage() {
     phone: "",
     address: "",
     image: "",
+    password: "",
   });
 
   const saveCustomersToDb = async (nextCustomers: Customer[]) => {
@@ -92,6 +86,7 @@ export default function CustomersPage() {
       phone: "",
       address: "",
       image: "",
+      password: "",
     });
     openModal();
   };
@@ -104,6 +99,7 @@ export default function CustomersPage() {
       phone: customer.phone,
       address: customer.address,
       image: customer.image ?? "",
+      password: customer.password ?? "",
     });
     openModal();
   };
@@ -126,21 +122,23 @@ export default function CustomersPage() {
 
   const handleSaveCustomer = () => {
     const trimmedImage = formData.image.trim();
+    const trimmedPassword = formData.password.trim();
     const nextFormData = {
       ...formData,
       image: trimmedImage.length > 0 ? trimmedImage : undefined,
+      password: trimmedPassword.length > 0 ? trimmedPassword : undefined,
     };
 
     if (editingCustomer) {
-      // Update existing customer
-      const nextCustomers = customers.map((customer) =>
-        customer.id === editingCustomer.id
-          ? {
-              ...customer,
-              ...nextFormData,
-            }
-          : customer
-      );
+      // Update existing customer, preserving password if left blank
+      const nextCustomers = customers.map((customer) => {
+        if (customer.id !== editingCustomer.id) return customer;
+        const updated = { ...customer, ...nextFormData } as Customer;
+        if (nextFormData.password === undefined) {
+          updated.password = customer.password;
+        }
+        return updated;
+      });
       setCustomers(nextCustomers);
       void saveCustomersToDb(nextCustomers);
     } else {
@@ -195,271 +193,23 @@ export default function CustomersPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/3">
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            Total des Clients
-          </p>
-          <p className="mt-2 text-2xl font-bold text-gray-800 dark:text-white/90">
-            {customers.length}
-          </p>
-        </div>
-        <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/3">
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            Revenu Total
-          </p>
-          <p className="mt-2 text-2xl font-bold text-gray-800 dark:text-white/90">
-            $
-            {customers
-              .reduce(
-                (sum, c) =>
-                  sum + parseFloat(c.totalSpent.replace(/[^0-9.]/g, "")),
-                0
-              )
-              .toFixed(0)}
-            K
-          </p>
-        </div>
-      </div>
+      <ClientsStats customers={customers} />
 
-      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/3">
-        <div className="max-w-full overflow-x-auto">
-          <Table>
-            <TableHeader className="border-b border-gray-100 dark:border-gray-800">
-              <TableRow>
-                <TableCell
-                  isHeader
-                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                >
-                  Client
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                >
-                  Contact
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                >
-                  Adresse
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                >
-                  Commandes
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                >
-                  Total Dépensé
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                >
-                  Dernière Commande
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                >
-                  Actions
-                </TableCell>
-              </TableRow>
-            </TableHeader>
-
-            <TableBody className="divide-y divide-gray-100 dark:divide-gray-800">
-              {filteredCustomers.length === 0 ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={7}
-                    className="px-5 py-8 text-center text-gray-500 dark:text-gray-400"
-                  >
-                    Aucun client trouvé
-                  </TableCell>
-                </TableRow>
-              ) : (
-                filteredCustomers.map((customer) => (
-                  <TableRow key={customer.id}>
-                    <TableCell className="px-5 py-3">
-                      <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 overflow-hidden rounded-full">
-                          <Image
-                            width={40}
-                            height={40}
-                            src={customer.image ?? DEFAULT_AVATAR}
-                            alt={customer.name}
-                            className="h-10 w-10 object-cover"
-                          />
-                        </div>
-                        <div>
-                          <p className="font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                            {customer.name}
-                          </p>
-                          <span className="text-gray-500 text-theme-xs dark:text-gray-400">
-                            ID: CUST-{String(customer.id).padStart(4, "0")}
-                          </span>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell className="px-5 py-3">
-                      <div>
-                        <p className="text-gray-500 text-theme-xs dark:text-gray-400">
-                          {customer.email}
-                        </p>
-                        <p className="text-gray-500 text-theme-xs dark:text-gray-400">
-                          {customer.phone}
-                        </p>
-                      </div>
-                    </TableCell>
-                    <TableCell className="px-5 py-3">
-                      <p className="text-gray-500 text-theme-xs dark:text-gray-400 max-w-[200px] truncate">
-                        {customer.address}
-                      </p>
-                    </TableCell>
-                    <TableCell className="px-5 py-3 text-gray-500 text-theme-sm dark:text-gray-400">
-                      {customer.totalOrders}
-                    </TableCell>
-                    <TableCell className="px-5 py-3 text-gray-500 text-theme-sm dark:text-gray-400">
-                      {customer.totalSpent}
-                    </TableCell>
-                    <TableCell className="px-5 py-3 text-gray-500 text-theme-sm dark:text-gray-400">
-                      {customer.lastOrder}
-                    </TableCell>
-                    <TableCell className="px-5 py-3">
-                      <div className="flex items-center gap-2">
-                        <button className="p-2 text-gray-500 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-gray-400">
-                          <EyeIcon className="w-4 h-4" />
-                        </button>
-                        <button className="p-2 text-gray-500 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-gray-400">
-                          <MailIcon className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => handleEditCustomer(customer)}
-                          className="p-2 text-gray-500 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-gray-400"
-                          title="Modifier"
-                        >
-                          <PencilIcon className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => handleRequestDeleteCustomer(customer)}
-                          className="p-2 text-red-500 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 dark:text-red-400"
-                          title="Supprimer"
-                        >
-                          <TrashBinIcon className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
-      </div>
+      <ClientsTable
+        customers={filteredCustomers}
+        onEdit={handleEditCustomer}
+        onDelete={handleRequestDeleteCustomer}
+      />
 
       {/* Ajouter/Modifier un Client */}
-      <Modal
+      <ClientFormModal
         isOpen={isOpen}
         onClose={closeModal}
-        className="max-w-[600px] p-5 lg:p-10"
-      >
-        <h4 className="mb-6 text-lg font-semibold text-gray-800 dark:text-white/90">
-          {editingCustomer ? "Modifier le Client" : "Ajouter un Nouveau Client"}
-        </h4>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSaveCustomer();
-          }}
-          className="space-y-5"
-        >
-          <div>
-            <Label>Nom Complet</Label>
-            <input
-              type="text"
-              placeholder="Entrez le nom du client"
-              value={formData.name}
-              onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
-              }
-              required
-              className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/10 focus:border-brand-300 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700"
-            />
-          </div>
-          <div>
-            <Label>Email</Label>
-            <input
-              type="email"
-              placeholder="Entrez l'adresse e-mail"
-              value={formData.email}
-              onChange={(e) =>
-                setFormData({ ...formData, email: e.target.value })
-              }
-              required
-              className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/10 focus:border-brand-300 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700"
-            />
-          </div>
-          <div>
-            <Label>Téléphone</Label>
-            <input
-              type="tel"
-              placeholder="Entrez le numéro de téléphone"
-              value={formData.phone}
-              onChange={(e) =>
-                setFormData({ ...formData, phone: e.target.value })
-              }
-              required
-              className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/10 focus:border-brand-300 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700"
-            />
-          </div>
-          <div>
-            <Label>Adresse</Label>
-            <input
-              type="text"
-              placeholder="Entrez l'adresse"
-              value={formData.address}
-              onChange={(e) =>
-                setFormData({ ...formData, address: e.target.value })
-              }
-              required
-              className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/10 focus:border-brand-300 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700"
-            />
-          </div>
-          <div>
-            <Label>Image (URL) (optionnel)</Label>
-            <input
-              type="text"
-              placeholder="Ex: /images/user/user-02.jpg ou https://..."
-              value={formData.image}
-              onChange={(e) =>
-                setFormData({ ...formData, image: e.target.value })
-              }
-              className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/10 focus:border-brand-300 dark:bg-gray-900 dark:text-white/90 dark:border-gray-700"
-            />
-            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-              Si vide, un avatar par défaut sera affiché.
-            </p>
-          </div>
-          <div className="flex items-center justify-end gap-3 pt-4">
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              onClick={closeModal}
-            >
-              Annuler
-            </Button>
-            <Button type="submit" size="sm">
-              {editingCustomer ? "Mettre à Jour" : "Ajouter"}
-            </Button>
-          </div>
-        </form>
-      </Modal>
+        onSubmit={handleSaveCustomer}
+        formData={formData}
+        setFormData={setFormData}
+        editingCustomer={editingCustomer}
+      />
 
       <ConfirmDeleteModal
         isOpen={isDeleteOpen}

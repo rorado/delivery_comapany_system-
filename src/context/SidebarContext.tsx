@@ -63,6 +63,17 @@ export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({
     setOpenSubmenu((prev) => (prev === item ? null : item));
   };
 
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const body = document.body;
+    if (isMobileOpen) {
+      body.classList.add("overflow-hidden");
+    } else {
+      body.classList.remove("overflow-hidden");
+    }
+    return () => body.classList.remove("overflow-hidden");
+  }, [isMobileOpen]);
+
   return (
     <SidebarContext.Provider
       value={{

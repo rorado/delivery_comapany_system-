@@ -25,6 +25,7 @@ const driverSchema = z.object({
   deliveries: z.number(),
   rating: z.number(),
   image: z.string().optional(),
+  password: z.string().optional(),
 });
 
 const driversSchema = z.array(driverSchema);

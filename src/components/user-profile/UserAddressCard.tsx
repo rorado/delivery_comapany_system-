@@ -50,14 +50,14 @@ export default function UserAddressCard() {
                 </p>
               </div>
 
-              <div>
+              {/* <div>
                 <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
                   TAX ID
                 </p>
                 <p className="text-sm font-medium text-gray-800 dark:text-white/90">
                   ICE 001234567000012
                 </p>
-              </div>
+              </div> */}
             </div>
           </div>
 
@@ -112,10 +112,10 @@ export default function UserAddressCard() {
                   <Input type="text" defaultValue="10000" />
                 </div>
 
-                <div>
+                {/* <div>
                   <Label>TAX ID</Label>
                   <Input type="text" defaultValue="ICE 001234567000012" />
-                </div>
+                </div> */}
               </div>
             </div>
             <div className="flex items-center gap-3 px-2 mt-6 lg:justify-end">
