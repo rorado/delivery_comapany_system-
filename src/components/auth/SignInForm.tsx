@@ -13,7 +13,9 @@ export default function SignInForm() {
   const [isChecked, setIsChecked] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [userType, setUserType] = useState<"admin" | "delivery" | "client">("admin");
+  const [userType, setUserType] = useState<"admin" | "delivery" | "client">(
+    "admin"
+  );
   const router = useRouter();
 
   // Demo credentials for testing
@@ -35,7 +37,7 @@ export default function SignInForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const credentials = demoCredentials[userType];
-    
+
     // Simple authentication logic - in production, use proper auth
     if (email === credentials.email && password === credentials.password) {
       // Redirect based on user type
@@ -47,7 +49,9 @@ export default function SignInForm() {
         router.push("/client");
       }
     } else {
-      alert("Invalid email or password. Please check the credentials below the form.");
+      alert(
+        "Invalid email or password. Please check the credentials below the form."
+      );
     }
   };
 
@@ -114,7 +118,7 @@ export default function SignInForm() {
           </div>
 
           <div>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-5">
+            {/* <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-5">
               <button className="inline-flex items-center justify-center gap-3 py-3 text-sm font-normal text-gray-700 transition-colors bg-gray-100 rounded-lg px-7 hover:bg-gray-200 hover:text-gray-800 dark:bg-white/5 dark:text-white/90 dark:hover:bg-white/10">
                 <svg
                   width="20"
@@ -165,7 +169,7 @@ export default function SignInForm() {
                   Ou
                 </span>
               </div>
-            </div>
+            </div> */}
             <form onSubmit={handleSubmit}>
               <div className="space-y-6">
                 <div>
@@ -248,7 +252,8 @@ export default function SignInForm() {
                   <strong>Admin:</strong> admin@fastdeliver.com / admin123
                 </p>
                 <p>
-                  <strong>Delivery:</strong> delivery@fastdeliver.com / delivery123
+                  <strong>Delivery:</strong> delivery@fastdeliver.com /
+                  delivery123
                 </p>
                 <p>
                   <strong>Client:</strong> client@fastdeliver.com / client123
